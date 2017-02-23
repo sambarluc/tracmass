@@ -32,6 +32,10 @@ ifeq ($(NETCDFLIBS),"automatic-44")
 	INC_DIR = $(shell nf-config --cflags)
 	LIB_DIR = $(shell nf-config --flibs)
 endif 
+ifeq ($(NETCDFLIBS),"ecol-WS")
+	INC_DIR = $(shell nf-config --cflags)
+	LNK_FLAGS = -L/usr/lib/x86_64-linux-gnu -lnetcdf -lnetcdff 
+endif 
 ifeq ($(NETCDFLIBS),"macports")
 	LIB_DIR          = -L/opt/local/lib
 	INC_DIR          = -I/opt/local/include/
