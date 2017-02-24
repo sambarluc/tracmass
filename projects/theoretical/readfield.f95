@@ -34,7 +34,7 @@ subroutine readfields
 
   ! Parameters for Nicoletta Fabboni velocities.
   ug     = 0.04 
-  u0     = 0.5 
+  u0     = 0.3 
   fcor   = 2. * 2. * pi/(24.*3600.) * cos(45.*pi/180.)
   gamma  = 1./(2.89*24.*3600.)
   gammag = 1./(28.9*24.*3600.)

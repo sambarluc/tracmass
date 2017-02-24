@@ -61,7 +61,7 @@ kmt=KM ! flat bottom
 ! Nicoletta Fabboni velocities, which have analytical solutions
 dxv (:,:) = 250. 
 dyu (:,:) = dxv(:,:)
-dxdy(:,:) = dxv(:,:) * dyu(:,:)
+dxdy(:,:) = dxv(:imt,:) * dyu(:imt,:)
 dz  (:)   = 10.
 dzt(:,:,:,:) = 10.
 

@@ -15,5 +15,5 @@ NETCDFLIBS	       = "none"
 
 #================================================================
 
-include Makefile.global
+include $(HOME)/git/tracmass/Makefile.global
 
