@@ -37,7 +37,7 @@
 &INIT_GRID_TIME
    fieldsperfile =      1,
             ngcm =      1,
-            iter =      1,
+            iter =     10,
           intmax = 146000,
         minveljd =     -1,
         maxveljd =     -1,
@@ -45,7 +45,7 @@
 &INIT_START_DATE
         startsec =      0,
         startmin =      0,
-       starthour =      1,
+       starthour =      0,
         startday =      1,
         startmon =      1,
        startyear =   1988,
@@ -54,7 +54,7 @@
 /
 &INIT_RUN_TIME
          intspin =      1,
-          intrun =  100,
+          intrun =    100,
 /
 &INIT_WRITE_TRAJS
       twritetype =      2,

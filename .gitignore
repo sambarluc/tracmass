@@ -2,6 +2,7 @@
 *.mod
 *.pyc
 *.log
+results
 runtraj
 runtracmass
 runtrm

@@ -69,8 +69,8 @@ mask(:,:) = 1
 
 do j = 1, jmt
    do i = 1, imt
-      lon(i,j) = i * dxv(i,j) / 111000.
-      lat(i,j) = j * dyu(i,j) / 111000.
+      lon(i,j) = i * dxv(i,j)
+      lat(i,j) = j * dyu(i,j)
    end do 
 end do
 

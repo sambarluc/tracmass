@@ -35,7 +35,7 @@ subroutine readfields
   ! Parameters for Nicoletta Fabboni velocities.
   ug     = 0.04 
   u0     = 0.3 
-  fcor   = 2. * 2. * pi/(24.*3600.) * cos(45.*pi/180.)
+  fcor   = 1.05E-4
   gamma  = 1./(2.89*24.*3600.)
   gammag = 1./(28.9*24.*3600.)
   omtime = dble(ints-intstart) * dble(ngcm*3600)
@@ -84,8 +84,8 @@ do k=1,KM
 ! Nicoletta Fabboni velocities, which have analytical solutions
 ! -------------------------------------------------------------
          uflux(i,j,k,2) = dyu(i,j) * dzt(i,j,k,2) * ( ug*dexp(-gammag*omtime) + &
-                                             (u0-ug) * dexp(-gamma*omtime) * cos(fcor*omtime+pi/2.d0) )
-         vflux(i,j,k,2) = dxv(i,j) * dzt(i,j,k,2) * ( -(u0-ug) * dexp(-gamma*omtime) * sin(fcor*omtime+pi/2.d0) )
+                                             (u0-ug) * dexp(-gamma*omtime) * cos(fcor*omtime) )
+         vflux(i,j,k,2) = dxv(i,j) * dzt(i,j,k,2) * ( -(u0-ug) * dexp(-gamma*omtime) * sin(fcor*omtime) )
 
 if(j==1 .or. j==JMT) vflux(i,j,k,2)=0.
 
