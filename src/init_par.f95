@@ -248,7 +248,7 @@ SUBROUTINE init_params
            ( dble((endHour)*3600 + endMin*60 + endSec) / 86400 ) -baseJD
    end if
    if (endJD < startJD) then
-      endJD =  baseJD + startJD + intrun*ngcm/24. -2
+      endJD =  baseJD + startJD + intrun*ngcm/24. -1
    end if
    call  gdate (endJD ,endYear , endMon ,endDay)
    endFrac = (endJD-int(endJD))*24
