@@ -9,37 +9,37 @@
 #------------------------------------------------------------------------
 #  fl03   = -Dtempsalt       # Include temp and salt
    fl04   = -Dtextwrite      # Write results to textfile
-#  fl04   = -Dcsvwrite       # Write results to comma-separated file
-#  fl04   = -Dbinwrite       # Write results to binaryfile
-#  fl04   = -Dmysqlwrite     # Write results to mysql
+#  fl05   = -Dcsvwrite       # Write results to comma-separated file
+   fl06   = -Dbinwrite       # Write results to binaryfile
+#  fl07   = -Dmysqlwrite     # Write results to mysql
 #------------------------------------------------------------------------
-#  fl07  = -Dstreamxy       # Calculates the barotropic stream function.
-#  fl08  = -Dstreamr        #    vertical stream function, z=density
-#  fl09  = -Dstreamts       #    vertical stream function, z=???
-#  fl10  = -Dstreamv        #    vertical stream function, z=depth
-#  fl11  = -Drerun          # Stores the Lagrangian stream functions as a
+#  fl08  = -Dstreamxy       # Calculates the barotropic stream function.
+#  fl09  = -Dstreamr        #    vertical stream function, z=density
+#  fl10  = -Dstreamts       #    vertical stream function, z=???
+#  fl11  = -Dstreamv        #    vertical stream function, z=depth
+#  fl12  = -Drerun          # Stores the Lagrangian stream functions as a
                             # function of the end positions that has been
                             # calculated in an identical previous run.    
-#  fl12  = -Dinitxyt        # Start trajectories at given positions and times
+#  fl13  = -Dinitxyt        # Start trajectories at given positions and times
 #------------------------------------------------------------------------
-#  fl13  = -Dtwodim         # Turn off vertical velocities.
-   fl14  = -Dfull_wflux     # Use a full 3D wflux field.
-   fl15  = -Dexplicit_w     # Use a given vertical velocity.
+#  fl14  = -Dtwodim         # Turn off vertical velocities.
+   fl15  = -Dfull_wflux     # Use a full 3D wflux field.
+   fl16  = -Dexplicit_w     # Use a given vertical velocity.
 #------------------------------------------------------------------------
-#  fl16  = -Dvarbottombox   # Variable bottom box to match actual depth
-#  fl17  = -Dfreesurface    # Variable bottom box to match actual depth
-#  fl18  = -Dzvec1D         # Cell depths defined as vector (for z-coord?)
-   fl18  = -Dzgrid3D        # Cell depths defined as 3D grid (for sigma)
-#  fl18  = -Dzgrid3Dt       # Cell depths 3D and time interp. (for atm)
+#  fl17  = -Dvarbottombox   # Variable bottom box to match actual depth
+#  fl18  = -Dfreesurface    # Variable bottom box to match actual depth
+#  fl19  = -Dzvec1D         # Cell depths defined as vector (for z-coord?)
+   fl20  = -Dzgrid3D        # Cell depths defined as 3D grid (for sigma)
+#  fl21  = -Dzgrid3Dt       # Cell depths 3D and time interp. (for atm)
 #------------------------------------------------------------------------
-#  fl20  = -Dselect         # Select only one trajectory (for debugging)
-#  fl21  = -Dtracer         # Stores a simulated tracer
-#  fl22  = -Dsediment       # Sediment code developed for RCO
+#  fl22  = -Dselect         # Select only one trajectory (for debugging)
+#  fl23  = -Dtracer         # Stores a simulated tracer
+#  fl24  = -Dsediment       # Sediment code developed for RCO
 #------------------------------------------------------------------------
-#  fl23  = -Dturb           # Adds subgrid turbulent velocities 
-#  fl24  = -Ddiffusion      # Adds a diffusion on trajectory
-#  fl25  = -Danisodiffusion # Adds an anisotropic diffusion on trajectory
-#  fl26  = -Dcoarse         # Adds a diffusion on trajectory
+#  fl25  = -Dturb           # Adds subgrid turbulent velocities 
+#  fl26  = -Ddiffusion      # Adds a diffusion on trajectory
+#  fl27  = -Danisodiffusion # Adds an anisotropic diffusion on trajectory
+#  fl28  = -Dcoarse         # Adds a diffusion on trajectory
 #========================================================================
 
 ORM_FLAGS= -D$(PROJECT) \

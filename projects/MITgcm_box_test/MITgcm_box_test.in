@@ -112,7 +112,7 @@
         seedtype =      1,
             ist1 =     30,
             ist2 =     30,
-            jst1 =      2,
+            jst1 =      1,
             jst2 =     30,
 ! k goes from 1 (bottom) upwards
             kst1 =      3,

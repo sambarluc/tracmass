@@ -73,9 +73,22 @@ SUBROUTINE readfields
   !Density not included
   !SSH not included
   
+  !CA Grid definition in tracmass seemr to be rather inconsistent
+  !CA uflux is allocated as an (imt,jmt,kmt,2) array, while
+  !CA vflux as an (imt,0:jmt,kmt,2) and wflux (imt+2, jmt+2, 0:km,2)
+  !CA The indices are different from MITgcm, with u(i-i,j,k) and v(i,j-1,k)
+  !CA entering w(i,j,k) cell. On top of that, the 0 boundary conditions
+  !CA are applied differently for different fields. uflux has a zero line
+  !CA for i=imt, which is accessed with a looping index (called iam) while 
+  !CA the two boundary conditions are stored for vvel.
+  !CA TODO: make a consistent grid definition
   kloop: do k=1,km
-     uflux(:,:,km-k+1,2)     = uvel(:,:,k)*dyu*dzu(:,:,k,1)
-     vflux(:,1:imt,km-k+1,2) = vvel(:,:,k)*dxv*dzv(:,:,k,1)
+    !In MITgcm, uvel(1,:) holds the boundary condition
+    ! Here we basically switch the BC from index i=1 to i=imt,
+    ! because this is what the code expects. Silly.
+     uflux(1:imt-1,:,km-k+1,2) = uvel(2:imt,:,k)*dyu(2:imt,:)*dzu(2:imt,:,k,1)
+    !In MITgcm, vvel(:,1) holds the boundary condition
+     vflux(:,0:jmt-1,km-k+1,2) = vvel(:,:,k)*dxv*dzv(:,:,k,1)
 #ifdef explicit_w
      wflux(1:imt,1:jmt,km-k+1,2) = wvel(:,:,k)*dxdy
 #endif
