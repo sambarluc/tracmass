@@ -227,7 +227,9 @@ SUBROUTINE init_params
    baseJD   =  jdate(baseYear  ,baseMon  ,baseDay)  + &  
            ( dble((baseHour)*3600 + baseMin*60 + baseSec) / 86400 )
    if (startJD < 1) then
-      startJD  =  jdate(startYear ,startMon ,startDay) + 1 + &  
+      ! Adding and substracting one day just does not make any sense to me
+!CA      startJD  =  jdate(startYear ,startMon ,startDay) + 1 + &  
+      startJD  =  jdate(startYear ,startMon ,startDay) + &  
            ( dble((startHour)*3600 + startMin*60 + startSec) / 86400 ) -baseJD
    else
       call  gdate (baseJD + startJD ,startYear , startMon ,startDay)
@@ -248,7 +250,9 @@ SUBROUTINE init_params
            ( dble((endHour)*3600 + endMin*60 + endSec) / 86400 ) -baseJD
    end if
    if (endJD < startJD) then
-      endJD =  baseJD + startJD + intrun*ngcm/24. -1
+      endJD =  baseJD + startJD + intrun*ngcm/24.
+      ! Adding and substracting one day just does not make any sense to me
+!CA      endJD =  baseJD + startJD + intrun*ngcm/24. -1
    end if
    call  gdate (endJD ,endYear , endMon ,endDay)
    endFrac = (endJD-int(endJD))*24
