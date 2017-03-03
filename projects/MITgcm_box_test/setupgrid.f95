@@ -1,5 +1,5 @@
-SUBROUTINE readfields
-
+SUBROUTINE setupgrid
+  
   USE mod_param
   USE mod_vel
   
@@ -7,20 +7,34 @@ SUBROUTINE readfields
   USE mod_grid
   USE mod_name
   USE mod_vel
-  
-#ifdef tempsalt
-  USE mod_dens
-#endif
-  
+
   IMPLICIT none
+  ! =============================================================
+  !    ===  Set up the grid ===
+  ! =============================================================
+  ! Subroutine for defining the grid of MITgcm.
+  ! Run once before the loop starts.
+  ! -------------------------------------------------------------
+  ! The following arrays has to be populated:
+  !
+  !  dxdy - Horizontal area of cells (T points)
+  !  dz   - Thickness of standard level (T point) 
+  !  dzt  - Time-invariant thickness of level (T point)
+  !  dzu  - Time-invariant thickness of level (U point)
+  !  dzv  - Time-invariant thickness of level (V point)
+  !  kmt  - Number of levels from surface to seafloor (T point)
+  !  kmu  - Number of levels from surface to seafloor (U point)
+  !  kmv  - Number of levels from surface to seafloor (V point)
+  ! -------------------------------------------------------------
+
+
   ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
   ! = Variables for filename generation 
   INTEGER, SAVE                             :: nread,ndates
-  INTEGER                                   :: timeStepNumber
   CHARACTER(LEN=10), SAVE                   :: fstamp
   
   ! = Loop variables
-  INTEGER                                   :: t ,i ,j ,k
+  INTEGER                                   :: i ,j ,k
   
   ! = Variables used for getfield procedures
   CHARACTER (len=200)                       :: gridfile
@@ -29,62 +43,74 @@ SUBROUTINE readfields
   INTEGER, DIMENSION(3)                     :: start3d, count3d
   INTEGER                                   :: ierr
 
-  ! ===   ===   ===
-
-  call datasetswap !Copy field(t+1) to field(t).
-
-  write(*,*) "ints: ", ints
-  timeStepNumber = ints*180 ! 180 is the number of MITgcm timesteps in one output unit
-  fstamp='0000000000'
-  write (fstamp,'(i10.10)') timeStepNumber
+  ! = MITgcm Grid fields
+  REAL, SAVE, ALLOCATABLE, DIMENSION(:,:,:) :: hFacW   ,hFacS, hFacC
   
-  ! === initialise ===
-  !print *,'ints=',ints,intstart
-  initCond: if(ints.eq.intstart) then
-     ! call coordinat
-     hs    = 0.
-     uflux = 0.
-     vflux = 0.
-#ifdef tempsalt
-     tem   = 0.
-     sal   = 0.
-     rho   = 0.
-#endif
-     ndates=0
-   endif initCond
+  allocate ( hFacW(imt,jmt,km) ,hFacS(imt,jmt,km) )
+  allocate ( hFacC(imt,jmt,km)                    )
   
+  ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
+
+  ! ======================================================
+  !    ===  Set up the grid ===
+  ! ======================================================
+  ! Vertical beginning/end indices
+  start1d  = 1
+  count1d  = 4
+  ! Horizontal beginning/end indices
+  start2d  = [   1,  1]
+  count2d  = [  60, 60]
+  ! 3D beginning/end indices
   start3d  = [   1,  1, 1]
   count3d  = [  60, 60, 4]
-  gridfile = trim(inDataDir)//'UVEL.'//fstamp//'.data'
-  uvel     = get3dfield()
-  gridfile = trim(inDataDir)//'VVEL.'//fstamp//'.data'
-  vvel     = get3dfield()
-  gridfile = trim(inDataDir)//'WVEL.'//fstamp//'.data'
-  wvel   = get3dfield()
 
-  write (*,*) '<file>.'//fstamp//'.data'
-  !CAwrite (*,*) "u-vel min/max", MINVAL(uvel), MAXVAL(uvel)
-  !CAwrite (*,*) "v-vel min/max", MINVAL(vvel), MAXVAL(vvel)
-  !CAwrite (*,*) "w-vel min/max", MINVAL(wvel), MAXVAL(wvel)
-  !CAwrite (*,*) "dyu min/max", MINVAL(dyu), MAXVAL(dyu)
-  !CAwrite (*,*) "dxv min/max", MINVAL(dxv), MAXVAL(dxv)
-  !CAwrite (*,*) "dzu min/max", MINVAL(dzu), MAXVAL(dzu)
-  !CAwrite (*,*) "dzv min/max", MINVAL(dzv), MAXVAL(dzv)
-  !Density not included
-  !SSH not included
-  
+  ! load grid
+  gridfile = trim(inDataDir) // 'DRF.data'
+  dz       = get1dfield()
+  dz       = dz(km:1:-1)
+  gridfile = trim(inDataDir) // 'RAC.data'
+  dxdy     = get2dfield()
+  gridfile = trim(inDataDir) // 'DXG.data'
+  dxv      = get2dfield()
+  gridfile = trim(inDataDir) // 'DYG.data'
+  dyu      = get2dfield() 
+  gridfile = trim(inDataDir) // 'hFacW.data'
+  hFacW    = get3dfield()
+  gridfile = trim(inDataDir) // 'hFacS.data'
+  hFacS    = get3dfield()
+  gridfile = trim(inDataDir) // 'hFacC.data'
+  hFacC    = get3dfield()
+
+  kmt      = sum(ceiling(hFacC),3)
+  allocate ( kmu(imt,jmt), kmv(imt,jmt) )
+  kmu      = sum(ceiling(hFacW),3)
+  kmv      = sum(ceiling(hFacS),3)
+
+  allocate ( dzu(imt,jmt,km,1),dzv(imt,jmt,km,1) )
+
   kloop: do k=1,km
-     uflux(:,:,km-k+1,2)     = uvel(:,:,k)*dyu*dzu(:,:,k,1)
-     vflux(:,1:imt,km-k+1,2) = vvel(:,:,k)*dxv*dzv(:,:,k,1)
-#ifdef explicit_w
-     wflux(1:imt,1:jmt,km-k+1,2) = wvel(:,:,k)*dxdy
-#endif
+     dzt(:,:,km-k+1,1) = dz(k)*hFacC(:,:,k)
+     dzu(:,:,km-k+1,1) = dz(k)*hFacW(:,:,k)
+     dzv(:,:,km-k+1,1) = dz(k)*hFacS(:,:,k)
   end do kloop
+  dzt(:,:,:,2) = dzt(:,:,:,1)
 
-  return
+  !
+  ! Ensure thickness is zero in invalid points
+  !
+  do k=1,km
+     where (k .le. (km-kmt(1:imt,1:jmt)))
+        dzt(:,:,k,1) = 0
+        dzu(:,:,k,1) = 0
+        dzv(:,:,k,1) = 0
+     end where
+  enddo 
 
 
 
+!
+! Copied from readfields
+!
 contains
   ! ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###
   function get1dfield ()
@@ -146,4 +172,4 @@ contains
     close (3001)
   end function get3dfield
 
-end subroutine readfields
+end SUBROUTINE setupgrid
