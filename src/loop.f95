@@ -267,7 +267,9 @@ SUBROUTINE loop
            z0  = z1
            ia  = ib
            iam = ia-1
+#ifndef MITgcm
            if(iam == 0) iam = IMT
+#endif
            ja  = jb
            ka  = kb
            

@@ -40,6 +40,8 @@
 #  fl26  = -Ddiffusion      # Adds a diffusion on trajectory
 #  fl27  = -Danisodiffusion # Adds an anisotropic diffusion on trajectory
 #  fl28  = -Dcoarse         # Adds a diffusion on trajectory
+#------------------------------------------------------------------------
+   fl29  = -DMITgcm         # Changes in grid definition for MITgcm
 #========================================================================
 
 ORM_FLAGS= -D$(PROJECT) \

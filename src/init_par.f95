@@ -317,7 +317,11 @@ SUBROUTINE init_params
 
       ALLOCATE ( csu (0:jmt), cst(jmt)  ) 
       ALLOCATE ( phi(0:jmt),   zlev(0:km) ) 
+#ifdef MITgcm
+      ALLOCATE ( dyt(jmt), dxv(imt,0:jmt), dyu(0:imt,jmt) ) 
+#else
       ALLOCATE ( dyt(jmt), dxv(imt+2,jmt), dyu(imt+2,jmt) ) 
+#endif
       ALLOCATE ( mask(imt,jmt) )
       mask = 1
       dyt = 0
@@ -336,18 +340,34 @@ SUBROUTINE init_params
     
       ! --- Allocate velocity fields, temperature, salinity, density, --- 
       ! --- sea-surface height, and trajectory data                   ---
-      ALLOCATE ( uflux(imt,jmt,km,nst), vflux(imt,0:jmt,km,nst) )
+      ALLOCATE ( vflux(imt,0:jmt,km,nst) )
+#ifdef MITgcm
+      ALLOCATE ( uflux(0:imt,jmt,km,nst) )
+      ALLOCATE ( hs(imt,jmt,nst) )
+#if defined explicit_w || full_wflux
+      ALLOCATE ( wflux(imt ,jmt ,0:km,NST) )
+#else
+      ALLOCATE ( wflux(0:km,NST) )
+#endif
+#else /*not MITgcm*/
+      ALLOCATE ( uflux(imt,jmt,km,nst) )
       ALLOCATE ( hs(imt+1,jmt+1,nst) )
 #if defined explicit_w || full_wflux
       ALLOCATE ( wflux(imt+2 ,jmt+2 ,0:km,NST) )
 #else
       ALLOCATE ( wflux(0:km,NST) )
 #endif
+#endif /*MITgcm*/
+
       hs    = 0.
       uflux = 0.
       vflux = 0.
       wflux = 0.d0
+#ifdef MITgcm
+      ALLOCATE ( uvel(imt,jmt,km) ,vvel(imt,jmt,km) ,wvel(imt,jmt,km) )
+#else
       ALLOCATE ( uvel(imt+2,jmt,km) ,vvel(imt+2,jmt,km) ,wvel(imt+2,jmt,km) )
+#endif
       
       ! === Init mod_traj ===
       ALLOCATE ( trj(NTRJ,ntracmax), nrj(NNRJ,ntracmax) )

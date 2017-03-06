@@ -1,5 +1,6 @@
 SUBROUTINE readfields
 
+  USE mod_getMITgcm
   USE mod_param
   USE mod_vel
   
@@ -24,10 +25,7 @@ SUBROUTINE readfields
   
   ! = Variables used for getfield procedures
   CHARACTER (len=200)                       :: gridfile
-  INTEGER                                   :: start1d, count1d
-  INTEGER, DIMENSION(2)                     :: start2d, count2d
   INTEGER, DIMENSION(3)                     :: start3d, count3d
-  INTEGER                                   :: ierr
 
   ! ===   ===   ===
 
@@ -56,11 +54,11 @@ SUBROUTINE readfields
   start3d  = [   1,  1, 1]
   count3d  = [  60, 60, 4]
   gridfile = trim(inDataDir)//'UVEL.'//fstamp//'.data'
-  uvel     = get3dfield()
+  uvel     = get3dfield(gridfile, start3d, count3d)
   gridfile = trim(inDataDir)//'VVEL.'//fstamp//'.data'
-  vvel     = get3dfield()
+  vvel     = get3dfield(gridfile, start3d, count3d)
   gridfile = trim(inDataDir)//'WVEL.'//fstamp//'.data'
-  wvel   = get3dfield()
+  wvel   = get3dfield(gridfile, start3d, count3d)
 
   write (*,*) '<file>.'//fstamp//'.data'
   !CAwrite (*,*) "u-vel min/max", MINVAL(uvel), MAXVAL(uvel)
@@ -73,90 +71,21 @@ SUBROUTINE readfields
   !Density not included
   !SSH not included
   
-  !CA Grid definition in tracmass seemr to be rather inconsistent
-  !CA uflux is allocated as an (imt,jmt,kmt,2) array, while
-  !CA vflux as an (imt,0:jmt,kmt,2) and wflux (imt+2, jmt+2, 0:km,2)
-  !CA The indices are different from MITgcm, with u(i-i,j,k) and v(i,j-1,k)
-  !CA entering w(i,j,k) cell. On top of that, the 0 boundary conditions
-  !CA are applied differently for different fields. uflux has a zero line
-  !CA for i=imt, which is accessed with a looping index (called iam) while 
-  !CA the two boundary conditions are stored for vvel.
-  !CA TODO: make a consistent grid definition
   kloop: do k=1,km
-    !In MITgcm, uvel(1,:) holds the boundary condition
-    ! Here we basically switch the BC from index i=1 to i=imt,
-    ! because this is what the code expects. Silly.
-     uflux(1:imt-1,:,km-k+1,2) = uvel(2:imt,:,k)*dyu(2:imt,:)*dzu(2:imt,:,k,1)
+    ! In MITgcm, uvel(1,:) holds the boundary condition
+    ! while tracmass expects it at 0. Furthermore, tracmass has a different
+    ! grid indexing than MITgcm, with velocities entering cell (i,j)
+    ! having indices (i-1,j) and (i, j-1). dyu and dxv have been defined
+    ! taking this index shift into account. Uvel and dzu are MITgcm-style,
+    ! thus here we combine the two into the overall flux which must follow
+    ! tracmass style.
+     uflux(0:imt-1,:,km-k+1,2) = uvel(:,:,k)*dyu(0:imt-1,:)*dzu(:,:,k,1)
     !In MITgcm, vvel(:,1) holds the boundary condition
-     vflux(:,0:jmt-1,km-k+1,2) = vvel(:,:,k)*dxv*dzv(:,:,k,1)
+     vflux(:,0:jmt-1,km-k+1,2) = vvel(:,:,k)*dxv(:, 0:jmt-1)*dzv(:,:,k,1)
 #ifdef explicit_w
      wflux(1:imt,1:jmt,km-k+1,2) = wvel(:,:,k)*dxdy
 #endif
   end do kloop
 
   return
-
-
-
-contains
-  ! ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###
-  function get1dfield ()
-    REAL, ALLOCATABLE,   DIMENSION(:)       :: get1dfield
-    INTEGER                                 :: d
-    INTEGER                                 :: rl
-  ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
-    d=count1d+start1d-1
-    allocate ( get1dfield(d) )
-    rl=d*4
-    open(unit=3001,file=gridfile, access='direct', recl=rl, iostat=ierr)
-    fileError: if(ierr.ne.0) then
-       print *,'Error when trying to open the file'
-       print *,'   ' ,gridfile
-       print *,'    Error code: ' , ierr
-       stop 3001
-    end if fileError
-    read(3001, rec=1) get1dfield
-    close (3001)
-  end function get1dfield
-
-  ! ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###  
-  function get2dfield ()
-    REAL, ALLOCATABLE,   DIMENSION(:,:)     :: get2dfield
-    INTEGER,             DIMENSION(2)       :: d
-    INTEGER                                 :: rl
-  ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
-    d=count2d+start2d-1
-    allocate ( get2dfield(d(1),d(2)) )
-    rl=product((d))*4
-    open(unit=3001,file=gridfile, access='direct', recl=rl, iostat=ierr)
-    fileError: if(ierr.ne.0) then
-       print *,'Error when trying to open the file'
-       print *,'   ' ,gridfile
-       print *,'    Error code: ' , ierr
-       stop 3001
-    end if fileError
-    read(3001, rec=1) get2dfield
-    close (3001)
-  end function get2dfield
-
-  ! ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###   ###  
-  function get3dfield ()
-    REAL, ALLOCATABLE,   DIMENSION(:,:,:)   :: get3dfield
-    INTEGER,             DIMENSION(3)       :: d
-    INTEGER                                 :: rl
-  ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
-    d=count3d+start3d-1
-    allocate ( get3dfield(d(1),d(2),d(3)) )
-    rl=product((d))*4
-    open(unit=3001,file=gridfile, access='direct', recl=rl, iostat=ierr)
-    fileError: if(ierr.ne.0) then
-       print *,'Error when trying to open the file'
-       print *,'   ' ,gridfile
-       print *,'    Error code: ' , ierr
-       stop 3001
-    end if fileError
-    read(3001, rec=1) get3dfield
-    close (3001)
-  end function get3dfield
-
 end subroutine readfields

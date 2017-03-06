@@ -109,7 +109,9 @@ if(ijk==1) then
  ii=ia
  iim=ia-1
  iil=iim
+#ifndef MITgcm
  if(iim==0) iil = imt
+#endif
  uu=uflux(ii ,ja,ka,nsm)
  um=uflux(iil,ja,ka,nsm)
  vv=uflux(ii ,ja,ka,nsp)
