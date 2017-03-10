@@ -27,10 +27,15 @@ CONTAINS
        CALL getenv('TRMOUTDATADIR', projdir)
        if (len(trim(projdir)) .ne. 0) then
           print *, 'Using outdatdir defined by TRMOUTDATADIR'
-          outDataDir = trim(projdir) // trim(Project) // '/'
+          outDataDir = trim(projdir) // trim(Project) 
+       ELSE
+          outDataDir = 'projects/'
        end if
     end if
-    if (outdircase .eqv. .true.) outDataDir = trim(outDataDir) // trim(Case) // '/'
+    if (outdircase .eqv. .true.) THEN
+       outDataDir = trim(outDataDir) // trim(Project) // '/'
+       outDataDir = trim(outDataDir) // 'results/' // trim(Case) // '/'
+    END IF
     if (outdirdate .eqv. .true.) then
        yearstr = 'XXXXXXXXXX'
        write (yearstr(:),'(I10.10)') int(intmin)
