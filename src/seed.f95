@@ -51,7 +51,6 @@ CONTAINS
 
      INTEGER                                  :: errCode
      INTEGER                                  :: subtimesteps = 1, subtstep
-    ! INTEGER                                  :: ib, jb, kb, ibm
      INTEGER                                  :: i, j, k, l, m
      REAL                                     :: temp,salt,dens
      REAL(DP)                                 :: tt, ts
@@ -110,9 +109,11 @@ CONTAINS
          vol = 0    
          ib  = iist
          ibm = ib-1
+#ifndef MITgcm
          IF (ibm == 0) THEN
             ibm = IMT
          END IF
+#endif
          jb  = ijst
          kb  = ikst
          
@@ -249,8 +250,8 @@ CONTAINS
                      END IF
 
                   CASE (4)   ! Spread evenly inside box                  
-                     x1 = DBLE (ibm)  + 0.25d0 * (DBLE(jjt)-0.5d0) / DBLE(ijt)
-                     y1 = DBLE (jb-1) + 0.25d0 * (DBLE(jkt)-0.5d0) / DBLE(ikt)
+                     x1 = DBLE (ibm)  + (DBLE(jjt)-0.5d0) / DBLE(ijt)
+                     y1 = DBLE (jb-1) + (DBLE(jkt)-0.5d0) / DBLE(ikt)
                      z1 = DBLE (kb-1) + 0.5d0
 
                   CASE (5)                  
@@ -284,7 +285,7 @@ CONTAINS
 
                   ! ts - time, fractions of ints
                   ! tt - time [s] rel to start
-                  ts = DBLE (ints-1) + seedsubints(subtstep)
+                  ts = DBLE (ints-intstart) + seedsubints(subtstep)
                   tt = ts * tseas
                   ! ---------------------------------------------------------
                   ! --- Put the new particle into the vectors trj and nrj ---
