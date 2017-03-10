@@ -33,7 +33,7 @@ CONTAINS
     if (outdircase .eqv. .true.) outDataDir = trim(outDataDir) // trim(Case) // '/'
     if (outdirdate .eqv. .true.) then
        yearstr = 'XXXXXXXXXX'
-       write (yearstr(:),'(I10.10)') int(intstart)
+       write (yearstr(:),'(I10.10)') int(intmin)
        outDataDir = trim(outDataDir)//trim(yearstr) // '/'
     end if    
     call system('mkdir -p ' // trim(outDataDir))
@@ -170,7 +170,7 @@ CONTAINS
 566 format(i8,i7,2f9.3,f6.2,2f10.2 &
          ,f12.0,f6.1,f6.2,f6.2,f6.0,8e8.1 )
 #else
-566 format(i8,i7,2f9.3,f6.2,2f10.2 &
+566 format(i8,i7,3f10.4,2f12.4 &
          ,f12.0,f6.1,f6.2,f6.2,f6.0,8e8.1 )
     !566 format(i7,i7,f7.2,f7.2,f7.1,f10.4,f10.4 &
     !         ,f13.4,f6.2,f6.2,f6.2,f6.0,8e8.1 )

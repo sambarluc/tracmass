@@ -38,7 +38,7 @@
             dtgcm   =     20,
             intmin  =  43200,
             intspin =      1,
-            endJD   =     15,
+            endJD   =     20,
             iter    =     60,
 /
 &INIT_WRITE_TRAJS
@@ -50,7 +50,7 @@
 !                 4 = write only start and end positions
 !                 5 = write at chosen intervals
 !                 6 = write each spatial grid-crossing 
-           kriva =      2,
+           kriva =      1,
       outdatadir = '/home/cimatori/Work/tracmass/results/',
      outdatafile = 'box_test',
  intmininoutfile =      0,
@@ -60,9 +60,9 @@
 !                 2 = Follow trajectories backward
 !                 3 = Follow trajectories both ways.
              nff =      1,
-! isec:           1 = Seed particles meridional(y-z)
-!                 2 = Seed particles zonal(x-z)
-!                 3 = Seed particles horiz(x-y)
+! isec:           1 = Seed particles meridional from the east (y-z)
+!                 2 = Seed particles zonal from the north (x-z)
+!                 3 = Seed particles horiz from top (x-y)
 !                 4 = Seed particles in the middle of T-box
             isec =      4,
 ! idir:           1 = follow positive direction (eastward/northward)  
@@ -94,7 +94,7 @@
             jst1 =      1,
             jst2 =     30,
 ! k goes from 1 (bottom) upwards
-            kst1 =      3,
+            kst1 =      4,
             kst2 =      4,
             tst1 =     -1,
             tst2 =     -1,

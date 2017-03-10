@@ -156,7 +156,7 @@ SUBROUTINE loop
   !==========================================================
   intsTimeLoop: do ints=intstart+nff, intstart+intrun, nff
      call fancyTimer('reading next datafield','start')
-     tt = ints*tseas
+     tt = (ints-intstart)*tseas
      if (degrade_counter < 1) call readfields
      degrade_counter = degrade_counter + 1
      if (degrade_counter > degrade_time) degrade_counter = 0

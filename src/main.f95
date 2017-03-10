@@ -3,7 +3,7 @@ PROGRAM TRACMASS
   USE mod_seed, only:  nqua, nff, num
   USE mod_grid, only:  dyu, dxv
   USE mod_time, only:  intmin, intstart, intend, intspin, intrun, intmax, &
-       partQuant, minvelints, voltr
+       partQuant, voltr
   USE mod_write, only: open_outfiles, close_outfiles
   USE mod_print, only: print_header_main, writesetup_main
 #ifdef diffusion
