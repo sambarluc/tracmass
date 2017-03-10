@@ -1,5 +1,24 @@
 PROGRAM TRACMASS
- 
+!
+! Some details on the grid definitions of tracmass
+! The grid indexing for the C-cell is:
+!
+!      -------v(i,j)-------      y=j
+!      |                  |
+!      |                  |
+!      |                  |
+!    u(i-1,j)  T(i,j)   u(i,j)   y=i-0.5
+!      |                  |
+!      |                  |
+!      |                  |
+!      -------v(i,j-1)-----      y=i-1
+!
+!    x=i-1    x=i-0.5    x=i
+!
+! Note this is not the same as in MITgcm, so when reading GCM
+! fields care must be taken in order to load the GCM field at
+! the right indices.
+!
   USE mod_seed, only:  nqua, nff, num
   USE mod_grid, only:  dyu, dxv
   USE mod_time, only:  intmin, intstart, intend, intspin, intrun, intmax, &
