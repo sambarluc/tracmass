@@ -23,25 +23,6 @@ data b1,b2,b3,b4/10725.0d0,  10275.0d0, 36.0d0,     13.0d0/
 
 data mois/31,28,31,30,31,30,31,31,30,31,30,31/
 !__________________________________________________________________________________________
-! Earth constants
-!radius = 6371229.d0 ! earth radius in metre
-!radian = pi/180.d0
-!deg=radius*radian ! ~ 111000 metre
-!tday=24.d0 * 3600.d0
-
-! month lengths including leap years
-do i=1900,3000
-do k=1,12
-idmax(k,i)=mois(k)
-enddo
-if((mod(i,4).eq.0 .and. mod(i,100).ne.0) .or.  mod(i,400).eq.0 ) idmax(2,i)=29
-!#if defined orc
-! do k=1,12  ! Julian days
-!  idmax(k,i)=idmax(k-1,i)+idmax(k,i)
-! enddo
-!#endif
-!print *,i,(idmax(k,i),k=1,12)
-enddo
 
 ! x,y gridsize in degrees
 

@@ -32,7 +32,6 @@ SUBROUTINE init_params
    INTEGER                                    ::  dummy ,factor ,i ,dtstep
    INTEGER                                    ::  gridVerNum ,runVerNum
    CHARACTER (LEN=30)                         ::  inparg, argname
-   real*8                                     ::  jd
 
 ! Setup namelists
    namelist /INIT_NAMELIST_VERSION/ gridVerNum
@@ -43,14 +42,14 @@ SUBROUTINE init_params
                                     subGridImax, subGridJmin, subGridJmax,   &
                                     subGridKmin, subGridKmax, SubGridFile,   &
                                     subGridID, nperio
-   namelist /INIT_BASE_TIME/        baseSec, baseMin, baseHour, baseDay,     &
-                                    baseMon, baseYear, jdoffset
-   namelist /INIT_GRID_TIME/        fieldsPerFile, ngcm, iter, intmax,       &
-                                    minvelJD, maxvelJD
-   namelist /INIT_START_DATE/       startSec, startMin, startHour,           & 
-                                    startDay, startMon, startYear,           &
-                                    startJD, intmin, noleap
-   namelist /INIT_RUN_TIME/         intspin, intrun
+! Define the time parameters:
+! ngcm    : number of hours between GCM output
+! dtgcm   : time step in seconds of the GCM simulation
+! intmin  : initial time step number of GCM, the simulation will start from this
+! intspin : seeding time in steps (of output of GCM simulation)
+! endJD   : number of days of the particle tracking simulation
+! iter    : number of time steps between GCM output
+   namelist /INIT_TIME/             ngcm, dtgcm, intmin, intspin, endJD, iter
    namelist /INIT_WRITE_TRAJS/      twritetype, kriva, outDataDir, outDataFile, &
                                     outdircase, intminInOutFile, intpsi, outdirdate
           
@@ -106,10 +105,7 @@ SUBROUTINE init_params
    READ (8,nml=INIT_GRID_DESCRIPTION)
    READ (8,nml=INIT_CASE_DESCRIPTION)
    READ (8,nml=INIT_GRID_SIZE)
-   READ (8,nml=INIT_BASE_TIME)
-   READ (8,nml=INIT_GRID_TIME)
-   READ (8,nml=INIT_START_DATE)
-   READ (8,nml=INIT_RUN_TIME)
+   READ (8,nml=INIT_TIME)
    READ (8,nml=INIT_WRITE_TRAJS)
    READ (8,nml=INIT_SEEDING)
    READ (8,nml=INIT_KILLZONES)
@@ -136,10 +132,7 @@ SUBROUTINE init_params
    READ (8,nml=INIT_GRID_DESCRIPTION)
    READ (8,nml=INIT_CASE_DESCRIPTION)
    READ (8,nml=INIT_GRID_SIZE)
-   READ (8,nml=INIT_BASE_TIME)
-   READ (8,nml=INIT_GRID_TIME)
-   READ (8,nml=INIT_START_DATE)
-   READ (8,nml=INIT_RUN_TIME)
+   READ (8,nml=INIT_TIME)
    READ (8,nml=INIT_WRITE_TRAJS)
    READ (8,nml=INIT_SEEDING)
    READ (8,nml=INIT_KILLZONES)
@@ -216,64 +209,30 @@ SUBROUTINE init_params
       end if
    end if
    
+   IF (endJD < startJD) then
+      PRINT *,'==================== ERROR ===================='
+      PRINT *,'End JD must be positive, number of days to run.'
+      PRINT *,'endJD = ' , endJD
+      STOP
+   END IF
+
 #ifdef timeanalyt
       iter=1
 #endif
-
-      
    timax    =  24.*3600.*timax ! convert time lengths from days to seconds
    dstep    =  1.d0/dble(iter)
-   dtmin    =  dstep * tseas
-   baseJD   =  jdate(baseYear  ,baseMon  ,baseDay)  + &  
-           ( dble((baseHour)*3600 + baseMin*60 + baseSec) / 86400 )
-   if (startJD < 1) then
-      ! Adding and substracting one day just does not make any sense to me
-!CA      startJD  =  jdate(startYear ,startMon ,startDay) + 1 + &  
-      startJD  =  jdate(startYear ,startMon ,startDay) + &  
-           ( dble((startHour)*3600 + startMin*60 + startSec) / 86400 ) -baseJD
-   else
-      call  gdate (baseJD + startJD ,startYear , startMon ,startDay)
-      startFrac = (startJD-int(startJD))*24
-      startHour = int(startFrac)
-      startFrac = (startFrac - startHour) * 60
-      startMin  = int(startFrac)
-   end if
+   ! number of GCM steps to run
+   intrun   =  jd2ints(endJD - startJD)
+     write(*,*) intrun 
    
    if (nff == 1) then
-      intmin = jd2ints(startJD)
+      intmax = intmin + intrun
    else
-      intmin = jd2ints(real(ceiling(startJD),8))
-   end if
-
-   if (endJD < 1) then
-      endJD  =  jdate(endYear ,endMon ,endDay) + 1 + &  
-           ( dble((endHour)*3600 + endMin*60 + endSec) / 86400 ) -baseJD
-   end if
-   if (endJD < startJD) then
-      endJD =  baseJD + startJD + intrun*ngcm/24.
-      ! Adding and substracting one day just does not make any sense to me
-!CA      endJD =  baseJD + startJD + intrun*ngcm/24. -1
-   end if
-   call  gdate (endJD ,endYear , endMon ,endDay)
-   endFrac = (endJD-int(endJD))*24
-   endHour = int(endFrac)
-   endFrac = (endFrac - endHour) * 60
-   EndMin  = int(endFrac)
-   endSec  = int((endFrac - currMin) * 60)
-
-   if (nff == 1) then
-      intmax = jd2ints(endJD)
-   else
-      intmax = jd2ints(real(ceiling(endJD),8))
+      intmax = intmin - intrun
    end if
    
-   if (maxvelJD > 0) then
-      minvelints = jd2ints(minvelJD)
-      maxvelints = jd2ints(maxvelJD)
-      intmax = maxvelints - intmin
-   end if
-
-   tseas= dble(ngcm)*3600.d0
+   tseas = dble(ngcm)*3600.d0
+   dtmin =  dstep * tseas
 
    ! --- ist -1 to imt ---
    IF ( ist1 == -1) THEN 

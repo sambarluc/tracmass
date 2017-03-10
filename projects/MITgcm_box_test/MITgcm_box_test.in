@@ -26,41 +26,20 @@
      subgridfile =     '',
        subgridid =      1,
 /
-&INIT_BASE_TIME
-         basesec =      0,
-         basemin =      0,
-        basehour =      0,
-         baseday =      1,
-         basemon =      1,
-        baseyear =   2001,
-/
-&INIT_GRID_TIME
-! number of fields per file
-   fieldsperfile =      1,
-! number of hours between MITgcm fields
-            ngcm =      1,
-! number of intermediate steps between output fields
-! not used with analytical time integration
-            iter =     60,
-          intmax = 100000,
-        minveljd =     -1,
-        maxveljd =     -1,
-/
-&INIT_START_DATE
-        startsec =      0,
-        startmin =      0,
-       starthour =      2,
-        startday =      1,
-        startmon =      1,
-       startyear =   2001,
-         startjd =     -1,
-         noleap =  .true., 
-! Time step equivalent to start time
-          intmin =      1,
-/
-&INIT_RUN_TIME
-         intspin =      1,
-          intrun =    718,
+&INIT_TIME
+! Define the time parameters:
+! ngcm   : number of hours between GCM output
+! dtgcm  : time step in seconds of the GCM simulation
+! intmin : initial time step number of GCM, the simulation will start from this
+! intspin : seeding time in steps (of output of GCM simulation)
+! endJD  : number of days of the particle tracking simulation
+! iter   : number of time steps between GCM output
+            ngcm    =      1,
+            dtgcm   =     20,
+            intmin  =  43200,
+            intspin =      1,
+            endJD   =     15,
+            iter    =     60,
 /
 &INIT_WRITE_TRAJS
       twritetype =      2,

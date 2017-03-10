@@ -16,7 +16,7 @@ module mod_write
   CHARACTER(LEN=20)                          :: rankstamp=''
   LOGICAL                                    :: outdirdate = .true.
   LOGICAL                                    :: outdircase = .true.
-  CHARACTER (LEN=30)                         :: yearstr
+  CHARACTER (LEN=10)                         :: yearstr
   
 CONTAINS
 
@@ -32,12 +32,8 @@ CONTAINS
     end if
     if (outdircase .eqv. .true.) outDataDir = trim(outDataDir) // trim(Case) // '/'
     if (outdirdate .eqv. .true.) then
-       yearstr = 'XXXXXXXX-XXXX'
-       write (yearstr(1:4),'(I4.4)') int(startYear)
-       write (yearstr(5:6),'(I2.2)') int(startMon)
-       write (yearstr(7:8),'(I2.2)') int(startDay)
-       write (yearstr(10:11),'(I2.2)') int(startHour)
-       write (yearstr(12:13),'(I2.2)') int(startMin)
+       yearstr = 'XXXXXXXXXX'
+       write (yearstr(:),'(I10.10)') int(intstart)
        outDataDir = trim(outDataDir)//trim(yearstr) // '/'
     end if    
     call system('mkdir -p ' // trim(outDataDir))

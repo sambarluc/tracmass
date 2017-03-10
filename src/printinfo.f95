@@ -45,12 +45,11 @@ CONTAINS
 
 
   subroutine writesetup_main
-    character (len=15)                           :: currDate ,currTime
+    CHARACTER (len=15) :: currDate ,currTime
 
     call lines
     call date_and_time(currDate, currTime)
-    print *,'Start date  : '//currDate(1:4)//'-'//currDate(5:6)//'-'//currDate(7:8)
-    print *,'Start time  : '//currTime(1:2)// ':'//currTime(3:4)// ':'//currTime(5:6)
+    print *,'Start time  : 0.0s' ! the model always starts from 0 
     print *,'Model code  : '//trim(GCMname)
     print *,'Data surce  : '//trim(gridName)
     print *,'Run name    : '//trim(caseName)
@@ -60,6 +59,10 @@ CONTAINS
     print *,'Prefix for output files    : ' ,trim(outDataFile)
     print *, thinline !--------------------------------------------------- 
     print *,"Selected compile options:"
+
+#if defined MITgcm
+    print *,' MITgcm configuration of grids'
+#endif
 
 #if defined zgrid3Dt
     print *,' - zgrid3Dt has been renamed to zgrid3D. Please update your'
@@ -139,34 +142,19 @@ CONTAINS
   subroutine print_start_loop()
     call lines
     print *, thickline!================================================= 
-    write(6,FMT='(A,I4,A,I2.2,A,I2.2,A,I2.2,A,I2.2)')          &
-         ' Start date in model-time     : ' , startYear, '-',  & 
-         startMon, '-', startDay,' ' ,startHour, ':', startMin
-  write(6,FMT='(A,I4,A,I2.2,A,I2.2,A,I2.2,A,I2.2)')          &
-         ' End date in model-time       : ' , endYear, '-',  & 
-         endMon, '-', endDay,' ' ,endHour, ':', endMin
-    write(6,FMT='(A,I5)') ' Length of run in timesteps   : ' ,intrun
-    write(6,FMT='(A,I5)') ' Number of seeding timesteps  : ' ,intspin
-    write(6,FMT='(A,I5)') ' Steps between two GCM fields : ' ,iter
+    write(6,FMT='(A,F6.2)')          &
+         ' Start time in days           : ' , startJD
+    write(6,FMT='(A,F6.2)')          &
+         ' End time in days             : ' , endJD
+    write(6,FMT='(A,I5)') ' Length of run in GCM output steps : ' ,intrun
+    write(6,FMT='(A,I5)') ' Number of seeding timesteps       : ' ,intspin
+    write(6,FMT='(A,I5)') ' Steps between two GCM fields      : ' ,iter
+    write(6,FMT='(A,I5)') ' Initial GCM time step             : ' ,intmin
 
 
-    !write(6,FMT='(A,I7 A,I7 A,I7)') ' intstart : ',intstart, & 
-    !                                ' intspin  : ',intspin,  &
-    !                                ' intrun   : ',intrun
-
-!    print 999,intstart,intspin,intrun,intend,nff,num,voltr,&
-!         tmin0,tmax0,smin0,smax0,rmin0,rmax0
-  
-!999 format(' intstart :',i7, '   intspin :',i7, &
-!         /,'   intrun :',i7, '   intend  :',i7, &
-!         /,'   nff :',i2,   
-!         /,'    voltr : ',f9.0,&
-!         /,'    tmin0 : ',f7.2,'  tmax0 : ',f7.2, &
-!         /,'    smin0 : ',f7.2,'  smax0 : ',f7.2,&
-!         /,'    rmin0 : ',f7.2,'  rmax0 : ',f7.2)
     print *, thinline !--------------------------------------------------- 
     print *,'t-step        run        out        err '  // & 
-            '       tot      dt      model date'
+            '       tot      dt      model time'
     print *, thinline !--------------------------------------------------- 
 
 
@@ -204,18 +192,18 @@ CONTAINS
     call updateClock
     if (loneparticle>0) then
        print 798 ,ints-intstart ,trj(1,loneparticle) ,trj(2,loneparticle), &
-            trj(3,loneparticle), nrj(6,loneparticle), wallmin, wallsec, loopYear, &
-            loopMon, loopDay, loopHour, loopMin 
+            trj(3,loneparticle), nrj(6,loneparticle), wallmin, wallsec, &
+            loopDay, loopHour, loopMin, loopSec
     else
        print 799 ,ints-intstart ,ntractot-nout ,nout ,nerror+nloop,ntractot, &
-            wallmin, wallsec, loopYear, loopMon, loopDay, loopHour, loopMin
+            wallmin, wallsec, loopDay, loopHour, loopMin, loopSec
     end if
 798    format(i7, '|', F8.2,  '|', F8.2,  '|', F8.2,  '|', i10, ' | ',  &
-            i2.2, ':', i2.2, ' | ', i4.4, '-', i2.2, '-', i2.2, ' ', &
-            i2.2, ':', i2.2)    
+            i2.2, ':', i2.2, ' | ', i4, ' ', &
+            i2.2, ':', i2.2, ':', i2.2)
 799    format(i7, '|', i10,  '|', i10,  '|', i10,  '|', i10, ' | ',  &
-            i2.2, ':', i2.2, ' | ', i4.4, '-', i2.2, '-', i2.2, ' ', &
-            i2.2, ':', i2.2)
+            i2.2, ':', i2.2, ' | ', i4, ' ', &
+            i2.2, ':', i2.2, ':', i2.2)
 #endif
   end subroutine print_cycle_loop
 

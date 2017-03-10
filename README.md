@@ -4,6 +4,9 @@ The code is written in FORTRAN 95 with modules and runs on UNIX platforms such a
 
 TRACMASS has been set up to run with velocities integrated with models such as NEMO, ORCA, ROMS, POM, MICOM, IFS-ECMWF and EC-Earth.
 
+Andrea Cimatoribus: Adapted code to work with binary MITgcm output. Stripped the code of all calendar functionality. That is done
+in the GCM and doing it a second time is only a source of confusion.
+
 
 Quickstart
 ==========

@@ -13,6 +13,7 @@ MODULE mod_param
   INTEGER                                   :: jmax, ntracmax
   INTEGER, PARAMETER                        :: MR=501 ! or 1001
   INTEGER                                   :: ncoor,kriva,iter,ngcm
+  REAL(DP)                                  :: dtgcm
   REAL(DP), PARAMETER                       :: UNDEF=1.d20 
   REAL(DP), PARAMETER                       :: EPS=1.d-7 ! the small epsilon
 
@@ -22,7 +23,6 @@ MODULE mod_param
   REAL(DP), PARAMETER                       :: radian = pi/180.d0  
   REAL(DP), PARAMETER                       :: deg=radius*radian   
   REAL(DP), PARAMETER                       :: tday=24.d0 * 3600.d0
-  INTEGER                                   :: idmax(12,1000:3000)
 ENDMODULE mod_param
 ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
 
@@ -185,48 +185,18 @@ MODULE mod_time
   INTEGER                                   :: intmin    ,intmax
   INTEGER                                   :: nff=1
 
-  !type for datetimes
-  type DATETIME
-     REAL(DP)                               :: JD=0 
-     REAL                                   :: frac=0, yd=0
-     INTEGER                                :: Year, Mon, Day
-     INTEGER                                :: Hour, Min, Sec
-  end type DATETIME
-  type(DATETIME), SAVE                      :: basetime, starttime
-  type(DATETIME), SAVE                      :: currtime, looptime
-  ! === Base for JD (When JD is 1)
-  REAL(DP)                                  :: baseJD=0
-  INTEGER                                   :: baseYear  ,baseMon  ,baseDay
-  INTEGER                                   :: baseHour  ,baseMin  ,baseSec
-  REAL(DP)                                  :: jdoffset=0
-  LOGICAL                                   :: noleap=.false.
-  ! === Timerange for velocity fields
-  REAL(DP)                                  :: minvelJD=0,   maxvelJD=0
-  INTEGER                                   :: minvelints, maxvelints
   ! === JD when the run starts
-  REAL(DP)                                  :: startJD=-999, ttpart, startFrac
-  INTEGER                                   :: startYear, startMon, startDay
-  INTEGER                                   :: startHour, startMin, startSec
-  REAL(DP)                                  :: endJD=-999, endFrac
-  INTEGER                                   :: endYear=0, endMon,   endDay
-  INTEGER                                   :: endHour,   endMin,   endSec
+  REAL(DP)                                  :: startJD=0, ttpart
+  REAL(DP)                                  :: endJD=-999
   ! === Current JD
-  REAL(DP)                                  :: currJDtot ,currJDyr,currfrac
-  INTEGER                                   :: currYear  ,currMon  ,currDay
-  INTEGER                                   :: currHour, currMin, currSec
-  INTEGER                                   :: leapoffset=0
+  REAL(DP)                                  :: currJDtot
   ! === Looping time
   INTEGER                                   :: loopints, loopintstart
-  REAL(DP)                                  :: loopJD, loopJDyr, loopFrac
-  INTEGER                                   :: loopYear  ,loopMon  ,loopDay
-  INTEGER                                   :: loopHour, loopMin, loopSec 
-  ! Old stuff
-  INTEGER                                   :: iyear ,imon ,iday ,ihour
-  INTEGER                                   :: yearmin ,yearmax
+  REAL(DP)                                  :: loopJD
+  INTEGER                                   :: loopDay
+  INTEGER                                   :: loopHour, loopMin, loopSec
 
   INTEGER*8                                 :: ntime
-  ! Used to figure out when to change file.
-  INTEGER                                   :: fieldsPerFile
   ! === Time-interpolation variables in loop ===
   REAL(DP)                                  :: dt, t0
   REAL(DP)                                  :: dtreg
@@ -243,90 +213,25 @@ CONTAINS
     ttpart = anint((anint(tt,8)/tseas-floor(anint(tt,8)/tseas))*tseas)/tseas
 
     currJDtot = (ints+ttpart)*(dble(ngcm)/24.)
-    call  gdate (baseJD+currJDtot-1+jdoffset + leapoffset,  &
-                 currYear , currMon ,currDay)
-    currJDyr = baseJD + currJDtot - jdate(currYear ,1 ,1) + jdoffset
     
-    if ((mod(currYear, 4) == 0)  .and. (currJDyr>56) .and.     &
-         (currJDyr<(56 - leapoffset + ngcm/24.)) .and. noleap) then
-       leapoffset = leapoffset + 1
-       call  gdate (baseJD+currJDtot-1+jdoffset + leapoffset,  &
-            currYear , currMon ,currDay)
-    end if
-    
-    currJDyr = baseJD + currJDtot - jdate(currYear ,1 ,1) + jdoffset
-    currFrac = (currJDtot-dble(int(currJDtot,8)))*24
-    currHour = int(currFrac,8)
-    currFrac = (currFrac - dble(currHour)) * 60
-    CurrMin  = int(currFrac,8)
-    currSec  = int((currFrac - dble(currMin)) * 60,8)
+    loopints = ints - intstart
 
-    if (ints > (maxvelints-1)) then
-       if (minvelints == 0) then
-          loopints = ints - intmax * int(real(ints-intstart)/intmax)
-       else
-          loopints = ints - intmax * int(real(ints-minvelints)/intmax)
-          intmax = maxvelints - minvelints
-       end if
-    else
-       loopints = ints
-    end if
-    loopJD = (loopints + ttpart)*(dble(ngcm)/24) !+ 1 TEST IF NEEDED
-    call  gdate (baseJD+loopJD-1+jdoffset ,loopYear, loopMon, loopDay)
-    loopJDyr = baseJD+loopJD - jdate(loopYear ,1 ,1)
-    loopFrac = (loopJD - dble(int(loopJD,8))) * 24
-    loopHour = int(loopFrac,8)
-    loopFrac = (loopFrac - dble(loopHour)) * 60
-    LoopMin  = int(loopFrac,8)
-    loopSec  = int((loopFrac - dble(loopMin)) * 60,8)
+    loopJD = (loopints + ttpart)*(dble(ngcm)/24)
+    loopDay  = int(loopJD)
+    loopJD = (loopJD - dble(loopDay)) * 24.0
+    loopHour = int(loopJD,8)
+    loopJD = (loopJD - dble(loopHour)) * 60
+    LoopMin  = int(loopJD,8)
+    loopSec  = int((loopJD - dble(loopMin)) * 60,8)
   end subroutine updateClock
-  
-  subroutine gdate (rjd, year,month,day)
-    !Computes the gregorian calendar date given a julian date (jd).
-    !Source: http://aa.usno.navy.mil/faq/docs/JD_Formula.php            
-    REAL(DP)                                   :: rjd
-    INTEGER                                  :: jd
-    INTEGER                                  :: year ,month ,day
-    INTEGER                                  :: i ,j ,k ,l ,n
-    
-    jd = int(rjd)
-    l= jd+68569
-    n= 4*l/146097
-    l= l-(146097*n+3)/4
-    i= 4000*(l+1)/1461001
-    l= l-1461*i/4+31
-    j= 80*l/2447
-    k= l-2447*j/80
-    l= j/11
-    j= j+2-12*l
-    i= 100*(n-49)+i+l
-    
-    year= i
-    month= j
-    day= k
-    return
-  end subroutine gdate
 
   INTEGER function jd2ints(jd)
     USE mod_param, only: ngcm
-    REAL(DP)                                    :: jd
-    jd2ints = int(floor((jd)/(real(ngcm)/24.))) 
+    REAL(DP) :: jd
+    jd2ints = nint((jd)/(real(ngcm)/24.))
     return
   end function jd2ints
   
-  INTEGER function jdate (year, month, day)
-    !Computes the julian date (JD) given a gregorian calendar date.
-    !Source: http://aa.usno.navy.mil/faq/docs/JD_Formula.php
-    INTEGER                                  :: year, month ,day
-    INTEGER                                  :: i, j, k
-    i     = year
-    j     = month
-    k     = day
-    jdate = K-32075+1461*(I+4800+(J-14)/12)/4+367*(J-2-(J-14)/12*12) &
-         /12-3*((I+4900+(J-14)/12)/100)/4
-    RETURN
-  end function jdate
-
   subroutine calc_time
     USE mod_loopvars, only: ds, dsc, dsmin
     use mod_grid, only: dxyz

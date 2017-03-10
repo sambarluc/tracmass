@@ -31,8 +31,7 @@ SUBROUTINE readfields
 
   call datasetswap !Copy field(t+1) to field(t).
 
-  write(*,*) "ints: ", ints
-  timeStepNumber = ints*180 ! 180 is the number of MITgcm timesteps in one output unit
+  timeStepNumber = intmin + (ints-intmin)*int(ngcm*3600.0/dtgcm)
   fstamp='0000000000'
   write (fstamp,'(i10.10)') timeStepNumber
   

@@ -18,17 +18,16 @@ PROGRAM TRACMASS
   call coordinat
   call writesetup_main
   
-  modrundirCond: if(nff == 1) then ! forward 
+  if(nff == 1) then ! forward 
      intstart =  intmin          
      intend   =  intmax
   elseif(nff == 2) then ! backward
-     intstart =  intmin+intrun
-     minvelints = minvelints + intrun
-     intend   =  intmin
+     intstart =  intmin
+     intend   =  intmax
      intspin  = -intspin
      intrun   = -intrun
-     nff      =  -1    
-  end if modrundirCond
+     nff      =  -1
+  end if
 
   call setupgrid
 
@@ -63,5 +62,3 @@ PROGRAM TRACMASS
   call close_outfiles
 
 end PROGRAM TRACMASS
-
-
