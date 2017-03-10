@@ -68,15 +68,15 @@ CONTAINS
 
 #if defined binwrite
     open(unit=75 ,file=trim(fullWritePref)//'_out.bin', &  
-         access='direct' ,form='unformatted' ,recl=24 ,status='replace')
+         access='direct' ,form='unformatted' ,recl=20 ,status='replace')
     open(unit=76 ,file=trim(fullWritePref)//'_run.bin', &  
-         access='direct' ,form='unformatted' ,recl=24 ,status='replace')
+         access='direct' ,form='unformatted' ,recl=20 ,status='replace')
     open(unit=77 ,file=trim(fullWritePref)//'_kll.bin', &
-         access='direct' ,form='unformatted' ,recl=24 ,status='replace')
+         access='direct' ,form='unformatted' ,recl=20 ,status='replace')
     open(unit=78 ,file=trim(fullWritePref)//'_ini.bin', &  
-         access='direct' ,form='unformatted' ,recl=24 ,status='replace')
+         access='direct' ,form='unformatted' ,recl=20 ,status='replace')
     open(unit=79 ,file=trim(fullWritePref)//'_err.bin', &  
-         access='direct' ,form='unformatted' ,recl=24 ,status='replace')
+         access='direct' ,form='unformatted' ,recl=20 ,status='replace')
 #endif
 
 #if defined csvwrite
@@ -275,7 +275,7 @@ t0     =  trj(7,ntrac)
     select case (sel)       
     case (10) !in
        recPosIn = recPosIn + 1
-       write(unit=78 ,rec=recPosIn) ntrac,twrite,x14,y14,z14
+       write(unit=78 ,rec=recPosIn)  real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
        return
     case (11)
        if(  (kriva == 1 .and. nrj(4,ntrac)  ==  niter-1 ) .or. &
@@ -290,23 +290,23 @@ t0     =  trj(7,ntrac)
           !z14=real(salt*rb+salt2*(1-rb),kind=4)
 #endif
           recPosRun = recPosRun+1
-          write(unit=76 ,rec=recPosRun) ntrac,twrite,x14,y14,z14
+          write(unit=76 ,rec=recPosRun) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
        end if
     case (13)
        recPosKll = recPosKll + 1
-       write(unit=77 ,rec=recPosKll) ntrac,twrite,x14,y14,z14   
+       write(unit=77 ,rec=recPosKll) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
     case (15)
        recPosRun = recPosRun + 1
-       write(unit=76 ,rec=recPosRun) ntrac,twrite,x14,y14,z14   
+       write(unit=76 ,rec=recPosRun) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
     case (17) !out
        recPosOut = recPosOut + 1
-       write(unit=77 ,rec=recPosOut) ntrac,twrite,x14,y14,z14   
+       write(unit=77 ,rec=recPosOut) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
     case (19) !end
        recPosOut = recPosOut + 1
-       write(unit=75 ,rec=recPosOut) ntrac,twrite,x14,y14,z14
+       write(unit=75 ,rec=recPosOut) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
     case (40) !error
        recPosErr=recPosErr + 1    
-       write(unit=79 ,rec=recPosErr) ntrac,twrite,x14,y14,z14   
+       write(unit=79 ,rec=recPosErr) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
     case (99) !switch
        if ((recPosRun > 50000000).and.(intminInOutFile.eq.2)) then
           call close_outfiles

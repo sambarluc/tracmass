@@ -223,7 +223,6 @@ SUBROUTINE init_params
    dstep    =  1.d0/dble(iter)
    ! number of GCM steps to run
    intrun   =  jd2ints(endJD - startJD)
-     write(*,*) intrun 
    
    if (nff == 1) then
       intmax = intmin + intrun
