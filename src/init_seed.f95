@@ -47,6 +47,21 @@ SUBROUTINE init_seed()
       numsd = 0
       landsd = 0
       IF (maxval(kmt) == 0) kmt = 1 
+#ifdef MITgcm
+      DO ji=ist1,ist2
+         DO jj=jst1,jst2
+           DO jk=kst1,kst2
+             IF (dzt(ji,jj,jk,1) .ne. 0) THEN 
+                numsd = numsd+1
+                seed_ijk (numsd,1:3) = [ ji, jj, jk ]
+                seed_set (numsd,1:2) = [ isec, idir ]
+             ELSE
+                landsd = landsd+1
+             END IF
+           END DO
+         END DO
+      END DO
+#else
       DO ji=ist1,ist2
          DO jj=jst1,jst2
             IF (mask(ji,jj) .ne. 0) THEN 
@@ -61,6 +76,7 @@ SUBROUTINE init_seed()
 
          END DO
       END DO
+#endif /*MITgcm*/
       nsdMax = numsd
       print *,'Particles are seeded in a box defined as:'
       print '(A,I7,A,I7)', '        ist1 : ', ist1, '   ist2 : ', ist2
