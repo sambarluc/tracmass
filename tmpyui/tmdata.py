@@ -1,42 +1,64 @@
 from __future__ import division, print_function
 
 
-def tmdata(mitdir, tmtracks, tstart, **xmitgcm):
+def tmdata(mitdir, tmtracks, tstart, **xmgcm):
     """
     mitdir:    Path to the MITgcm simulations results, used to load the grid information.
     tmdir:     File containing the Lagrangian tracks computed by tracmass.
     tstart:    Beginning time of the simulation, as a string with format "2010-01-24 12:20"
-    **xmitgcm: Keywords arguments passed to xmitgcm.mitgcmds to load MITgcm grid files.
+    **xmgcm:   Keywords arguments passed to xmgcm.mitgcmds to load MITgcm grid files.
     """
 
     import numpy as np
     import xarray as xr
     from xmitgcm import open_mdsdataset as mitgcmds
 
-    grid = mitgcmds(mitdir, read_grid=True, **xmitgcm)
+    xmgcm["swap_dims"] = False
+    grid = mitgcmds(mitdir, read_grid=True, **xmgcm)
 
-    ni = grid.i_g.size + 1
-    nj = grid.j_g.size + 1
-    xG = np.zeros((nj, ni))
-    yG = np.zeros((nj, ni))
-    # copy to array, we need numpy fancy indexing
-    xG[:-1, :-1] = grid.XG.to_masked_array()
-    yG[:-1, :-1] = grid.YG.to_masked_array()
-    cs = grid.CS.to_masked_array()
-    sn = grid.SN.to_masked_array()
-    dxG = grid.dxG.to_masked_array()
-    dyG = grid.dyG.to_masked_array()
+    if "geometry" in xmgcm.keys():
+        if xmgcm["geometry"]=="curvilinear":
+            ni = grid.i_g.size + 1
+            nj = grid.j_g.size + 1
+            xG = np.zeros((nj, ni))
+            yG = np.zeros((nj, ni))
+            # copy to array, we need numpy fancy indexing
+            xG[:-1, :-1] = grid.XG.to_masked_array()
+            yG[:-1, :-1] = grid.YG.to_masked_array()
+            cs = grid.CS.to_masked_array()
+            sn = grid.SN.to_masked_array()
+            dxG = grid.dxG.to_masked_array()
+            dyG = grid.dyG.to_masked_array()
 
-    # Fill (approximate) end points of the grid
-    xG[:-1, -1] = xG[:-1, -2] + dxG[:, -1] * cs[:, -1]
-    xG[-1, :-1] = xG[-2, :-1] - dyG[-1, :] * sn[-1, :]
-    # we lack the last metric at the NE corner, so we use the
-    # nearby metric
-    xG[-1, -1] = xG[-1, -2] + dxG[-1, -1] * cs[-1, -1]
+            # Fill (approximate) end points of the grid
+            xG[:-1, -1] = xG[:-1, -2] + dxG[:, -1] * cs[:, -1]
+            xG[-1, :-1] = xG[-2, :-1] - dyG[-1, :] * sn[-1, :]
+            # we lack the last metric at the NE corner, so we use the
+            # nearby metric
+            xG[-1, -1] = xG[-1, -2] + dxG[-1, -1] * cs[-1, -1]
 
-    yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :] * cs[-1, :]
-    yG[:-1, -1] = yG[:-1, -2] + dxG[:, -1] * sn[:, -1]
-    yG[-1, -1] = yG[-2, -1] + dyG[-1, -1] * cs[-1, -1]
+            yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :] * cs[-1, :]
+            yG[:-1, -1] = yG[:-1, -2] + dxG[:, -1] * sn[:, -1]
+            yG[-1, -1] = yG[-2, -1] + dyG[-1, -1] * cs[-1, -1]
+        elif xmgcm["geometry"]=="cartesian":
+            ni = grid.i.size + 1
+            nj = grid.j.size + 1
+            xG = np.zeros((nj, ni))
+            yG = np.zeros((nj, ni))
+            # copy to array, we need numpy fancy indexing
+            xG[:-1, :-1] = grid.XG.to_masked_array()
+            yG[:-1, :-1] = grid.YG.to_masked_array()
+            dxG = grid.dxG.to_masked_array()
+            dyG = grid.dyG.to_masked_array()
+
+            # Fill (approximate) end points of the grid
+            xG[:-1, -1] = xG[:-1, -2] + dxG[:, -1]
+            xG[-1, :] = xG[-2, :]
+
+            yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :]
+            yG[:, -1] = yG[:, -2]
+    else:
+        raise ValueError("Tell explicitely the grid geometry.")
 
     # tracmass has opposite Z order, Zu is the lower interface
     Z = grid.Zp1[::-1].to_masked_array()
@@ -55,20 +77,20 @@ def tmdata(mitdir, tmtracks, tstart, **xmitgcm):
     tracks = xr.Dataset()
     tracks.attrs["MITgcm_dir"] = mitdir
     tracks.attrs["tracmass_file"] = tmtracks
-    tracks.coords["p_id"] = ("p_id", ids)
+    tracks.coords["id"] = ("id", ids)
     tracks.coords["time"] = ("time", np.unique(tsteps))
     tracks["xtrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                         coords={"p_id": ids,
+                                         coords={"id": ids,
                                                  "time": tcoord},
-                                         dims=["p_id", "time"])
+                                         dims=["id", "time"])
     tracks["ytrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                         coords={"p_id": ids,
+                                         coords={"id": ids,
                                                  "time": tcoord},
-                                         dims=["p_id", "time"])
+                                         dims=["id", "time"])
     tracks["ztrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                         coords={"p_id": ids,
+                                         coords={"id": ids,
                                                  "time": tcoord},
-                                         dims=["p_id", "time"])
+                                         dims=["id", "time"])
 
     for thisid in ids:
         thisind = np.where(tmbin[:, 0]==thisid)[0]
@@ -89,18 +111,18 @@ def tmdata(mitdir, tmtracks, tstart, **xmitgcm):
         # x
         st = px * (py * xG[jj_int, ii_int] + ny * xG[jj_int+1, ii_int]) + \
              nx * (py * xG[jj_int, ii_int+1] + ny * xG[jj_int+1, ii_int+1])
-        tracks["xtrack"].loc[{"p_id": [thisid], "time": tsteps[thisind]}] = \
+        tracks["xtrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
         # y
         st = px * (py * yG[jj_int, ii_int] + ny * yG[jj_int+1, ii_int]) + \
              nx * (py * yG[jj_int, ii_int+1] + ny * yG[jj_int+1, ii_int+1])
-        tracks["ytrack"].loc[{"p_id": [thisid], "time": tsteps[thisind]}] = \
+        tracks["ytrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
         # z
         st = pz * Z[kk_int] + nz * Z[kk_int+1]
-        tracks["ztrack"].loc[{"p_id": [thisid], "time": tsteps[thisind]}] = \
+        tracks["ztrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
     return tracks
