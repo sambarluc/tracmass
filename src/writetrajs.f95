@@ -269,14 +269,7 @@ t0     =  trj(7,ntrac)
     x14=real(x1,kind=4)
     y14=real(y1,kind=4)
     z14=real(z1,kind=4)
-    if (twritetype==1) then
-       twrite = tt
-    else if (twritetype==2) then
-       call updateclock
-       twrite = currJDtot
-    else
-       twrite = real(ints,kind=8)
-    end if
+    twrite = tt/tday
     select case (sel)       
     case (10) !in
        recPosIn = recPosIn + 1

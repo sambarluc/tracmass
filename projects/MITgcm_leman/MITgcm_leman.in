@@ -51,7 +51,7 @@
 !                 5 = write at chosen intervals
 !                 6 = write each spatial grid-crossing 
            kriva =      1,
-      outdatadir = '/home/cimatori/Work/tracmass/results/',
+      outdatadir = '',
      outdatafile = 'leman',
  intmininoutfile =      0,
 /
