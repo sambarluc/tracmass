@@ -22,23 +22,29 @@ def tmdata(mitdir, tmtracks, tstart, **xmitgcm):
     # copy to array, we need numpy fancy indexing
     xG[:-1, :-1] = grid.XG.to_masked_array()
     yG[:-1, :-1] = grid.YG.to_masked_array()
-    # We need the last lines
-    dxG = grid.dxG.isel(i=-1)
-    dyG = grid.dyG.isel(j=-1)
+    cs = grid.CS.to_masked_array()
+    sn = grid.SN.to_masked_array()
+    dxG = grid.dxG.to_masked_array()
+    dyG = grid.dyG.to_masked_array()
+
     # Fill (approximate) end points of the grid
-    xG[-1, :] = xG[-2, :]
-    xG[:-1, -1] = xG[:-1, -1] + dxG
-    xG[-1, -1] = xG[-2, -1]
-    yG[-1, :-1] = yG[-1, :-1] + dyG
-    yG[:, -1] = yG[:, -2]
-    yG[-1, -1] = yG[-1, -2]
+    xG[:-1, -1] = xG[:-1, -2] + dxG[:, -1] * cs[:, -1]
+    xG[-1, :-1] = xG[-2, :-1] - dyG[-1, :] * sn[-1, :]
+    # we lack the last metric at the NE corner, so we use the
+    # nearby metric
+    xG[-1, -1] = xG[-1, -2] + dxG[-1, -1] * cs[-1, -1]
+
+    yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :] * cs[-1, :]
+    yG[:-1, -1] = yG[:-1, -2] + dxG[:, -1] * sn[:, -1]
+    yG[-1, -1] = yG[-2, -1] + dyG[-1, -1] * cs[-1, -1]
+
     # tracmass has opposite Z order, Zu is the lower interface
-    Z = grid.Zu[::-1].to_masked_array()
-    dZ = grid.drF[::-1].to_masked_array()
+    Z = grid.Zp1[::-1].to_masked_array()
 
     tmbin = np.fromfile(tmtracks, '>f4')
     if (tmbin.size % 5) != 0:
-        raise ValueError("Something is wrong in the size of the tracmass file.")
+        print("Something is wrong in the size of the tracmass file.")
+        tmbin = tmbin[:(tmbin.size//5)*5]
     tmbin = np.reshape(tmbin, (tmbin.size//5, 5))
     ids = np.unique(np.int32(tmbin[:, 0]))
     ntracks = ids.size
@@ -77,6 +83,8 @@ def tmdata(mitdir, tmtracks, tstart, **xmitgcm):
         px = 1.0 - nx
         ny = jj - jj_int
         py = 1.0 - ny
+        nz = kk - kk_int
+        pz = 1.0 - nz
 
         # x
         st = px * (py * xG[jj_int, ii_int] + ny * xG[jj_int+1, ii_int]) + \
@@ -91,7 +99,7 @@ def tmdata(mitdir, tmtracks, tstart, **xmitgcm):
                       np.atleast_2d(st)
 
         # z
-        st = Z[kk_int] + (kk - kk_int) * dZ[kk_int]
+        st = pz * Z[kk_int] + nz * Z[kk_int+1]
         tracks["ztrack"].loc[{"p_id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
