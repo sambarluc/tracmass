@@ -24,8 +24,6 @@ SUBROUTINE setupgrid
   !  dzu  - Time-invariant thickness of level (U point)
   !  dzv  - Time-invariant thickness of level (V point)
   !  kmt  - Number of levels from surface to seafloor (T point)
-  !  kmu  - Number of levels from surface to seafloor (U point)
-  !  kmv  - Number of levels from surface to seafloor (V point)
   ! -------------------------------------------------------------
 
 
@@ -82,29 +80,16 @@ SUBROUTINE setupgrid
   hFacC    = get3dfield(gridfile, start3d, count3d)
 
   kmt      = sum(ceiling(hFacC),3)
-  allocate ( kmu(imt,jmt), kmv(imt,jmt) )
-  kmu      = sum(ceiling(hFacW),3)
-  kmv      = sum(ceiling(hFacS),3)
 
   allocate ( dzu(imt,jmt,km,1),dzv(imt,jmt,km,1) )
 
+  ! Change the ordering of the vertical axis
   kloop: do k=1,km
      dzt(:,:,km-k+1,1) = dz(k)*hFacC(:,:,k)
      dzu(:,:,km-k+1,1) = dz(k)*hFacW(:,:,k)
      dzv(:,:,km-k+1,1) = dz(k)*hFacS(:,:,k)
   end do kloop
   dzt(:,:,:,2) = dzt(:,:,:,1)
-
-  !
-  ! Ensure thickness is zero in invalid points
-  !
-  do k=1,km
-     where (k .le. (km-kmt(1:imt,1:jmt)))
-        dzt(:,:,k,1) = 0
-        dzu(:,:,k,1) = 0
-        dzv(:,:,k,1) = 0
-     end where
-  enddo 
 
   return
 end SUBROUTINE setupgrid
