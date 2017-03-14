@@ -1,12 +1,17 @@
 from __future__ import division, print_function
 
 
-def tmdata(mitdir, tmtracks, tstart, **xmgcm):
+def tmdata(mitdir, tmtracks, tstart, inds=False, **xmgcm):
     """
     mitdir:    Path to the MITgcm simulations results, used to load the grid information.
     tmdir:     File containing the Lagrangian tracks computed by tracmass.
     tstart:    Beginning time of the simulation, as a string with format "2010-01-24 12:20"
+    inds:      Return tracks as indices too, default: False.
     **xmgcm:   Keywords arguments passed to xmgcm.mitgcmds to load MITgcm grid files.
+
+    Returns:
+        tracks: xarray Dataset containing time, id and position information of each particle.
+                If inds=True, return also the tracks as indices, not as physical coordinates.
     """
 
     import numpy as np
@@ -91,6 +96,19 @@ def tmdata(mitdir, tmtracks, tstart, **xmgcm):
                                          coords={"id": ids,
                                                  "time": tcoord},
                                          dims=["id", "time"])
+    if inds:
+        tracks["itrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
+                                             coords={"id": ids,
+                                                     "time": tcoord},
+                                             dims=["id", "time"])
+        tracks["jtrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
+                                             coords={"id": ids,
+                                                     "time": tcoord},
+                                             dims=["id", "time"])
+        tracks["ktrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
+                                             coords={"id": ids,
+                                                     "time": tcoord},
+                                             dims=["id", "time"])
 
     for thisid in ids:
         thisind = np.where(tmbin[:, 0]==thisid)[0]
@@ -100,6 +118,14 @@ def tmdata(mitdir, tmtracks, tstart, **xmgcm):
         jj_int = np.int32(jj)
         kk = tmbin[thisind, 4]
         kk_int = np.int32(kk)
+
+        if inds:
+            tracks["itrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
+                          np.atleast_2d(ii)
+            tracks["jtrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
+                          np.atleast_2d(jj)
+            tracks["ktrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
+                          np.atleast_2d(kk)
 
         nx = ii - ii_int
         px = 1.0 - nx
