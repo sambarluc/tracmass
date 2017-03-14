@@ -80,9 +80,9 @@ SUBROUTINE readfields
     ! tracmass style.
     ! NOTE: dzu and dzv are already ordered "tracmass-style" in the vertical
     ! from setupgrid.f95
-     uflux(0:imt-1,:,km-k+1,2) = uvel(:,:,k)*dyu(0:imt-1,:)*dzu(:,:,km-k+1,1)
+     uflux(0:imt-1,:,km-k+1,2) = dyu(0:imt-1,:)*uvel(:,:,k)*dzu(:,:,km-k+1,1)
     !In MITgcm, vvel(:,1) holds the boundary condition
-     vflux(:,0:jmt-1,km-k+1,2) = vvel(:,:,k)*dxv(:,0:jmt-1)*dzv(:,:,km-k+1,1)
+     vflux(:,0:jmt-1,km-k+1,2) = dxv(:,0:jmt-1)*vvel(:,:,k)*dzv(:,:,km-k+1,1)
 #ifdef explicit_w
      wflux(1:imt,1:jmt,km-k+1,2) = wvel(:,:,k)*dxdy
 #endif

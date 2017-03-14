@@ -24,6 +24,7 @@ SUBROUTINE setupgrid
   !  dzu  - Time-invariant thickness of level (U point)
   !  dzv  - Time-invariant thickness of level (V point)
   !  kmt  - Number of levels from surface to seafloor (T point)
+  !  kmtb - Number of fractional levels from surface to seafloor
   ! -------------------------------------------------------------
 
 
@@ -65,7 +66,6 @@ SUBROUTINE setupgrid
   ! load grid
   gridfile = trim(inDataDir) // 'DRF.data'
   dz       = get1dfield(gridfile, start1d, count1d)
-  dz       = dz(km:1:-1)
   gridfile = trim(inDataDir) // 'RAC.data'
   dxdy     = get2dfield(gridfile, start2d, count2d)
   gridfile = trim(inDataDir) // 'DXG.data'
@@ -80,6 +80,7 @@ SUBROUTINE setupgrid
   hFacC    = get3dfield(gridfile, start3d, count3d)
 
   kmt      = sum(ceiling(hFacC),3)
+  kmtb     = sum(hFacC,3)
 
   allocate ( dzu(imt,jmt,km,1),dzv(imt,jmt,km,1) )
 
@@ -90,6 +91,9 @@ SUBROUTINE setupgrid
      dzv(:,:,km-k+1,1) = dz(k)*hFacS(:,:,k)
   end do kloop
   dzt(:,:,:,2) = dzt(:,:,:,1)
+
+  ! Invert order of dz to be consistent with tracmass ordering
+  dz       = dz(km:1:-1)
 
   return
 end SUBROUTINE setupgrid

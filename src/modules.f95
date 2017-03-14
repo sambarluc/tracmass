@@ -112,6 +112,7 @@ MODULE mod_grid
   REAL(DP), ALLOCATABLE, DIMENSION(:)       :: aa, bb
 #endif
   INTEGER, ALLOCATABLE, DIMENSION(:,:)      :: kmt, kmu, kmv
+  REAL, ALLOCATABLE, DIMENSION(:,:)         :: kmtb
   INTEGER                                   :: subGrid     ,subGridID
   INTEGER                                   :: subGridImin ,subGridImax
   INTEGER                                   :: subGridJmin ,subGridJmax
@@ -353,7 +354,6 @@ CONTAINS
     hs(:,:,nsm)      = hs(:,:,nsp)
     uflux(:,:,:,nsm) = uflux(:,:,:,nsp)
     vflux(:,:,:,nsm) = vflux(:,:,:,nsp)
-!    wflux(:,nsm) = wflux(:,nsp) 
 #if  zgrid3D
     dzt(:,:,:,nsm)   = dzt(:,:,:,nsp)
 #endif

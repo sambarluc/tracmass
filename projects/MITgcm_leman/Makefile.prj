@@ -23,7 +23,7 @@
 #  fl13  = -Dinitxyt        # Start trajectories at given positions and times
 #------------------------------------------------------------------------
 #  fl14  = -Dtwodim         # Turn off vertical velocities.
-   fl15  = -Dfull_wflux     # Use a full 3D wflux field.
+#  fl15  = -Dfull_wflux     # Use a full 3D wflux field.
    fl16  = -Dexplicit_w     # Use a given vertical velocity.
 #------------------------------------------------------------------------
 #  fl17  = -Dvarbottombox   # Variable bottom box to match actual depth

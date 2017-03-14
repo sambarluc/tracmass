@@ -36,9 +36,9 @@
 ! iter   : number of time steps between GCM output
             ngcm    =      1,
             dtgcm   =     20,
-            intmin  =    180,
+            intmin  =  21600,
             intspin =      1,
-            endJD   =     30,
+            endJD   =     25,
             iter    =     60,
 /
 &INIT_WRITE_TRAJS
@@ -89,13 +89,13 @@
 !                 2 = Use a list to define which cells to seed.
 !                 3 = Use a 2-D mask file.
         seedtype =      1,
-            ist1 =    306,
-            ist2 =    316,
-            jst1 =      6,
-            jst2 =     16,
+            ist1 =     10,
+            ist2 =     20,
+            jst1 =      1,
+            jst2 =     64,
 ! k goes from 1 (bottom) upwards
-            kst1 =     16,
-            kst2 =     29,
+            kst1 =     30,
+            kst2 =     35,
             tst1 =     -1,
             tst2 =     -1,
          seeddir =     '',
@@ -114,11 +114,12 @@
      seedpart_id =      0,
 /
 &INIT_KILLZONES
-            nend =      2,
-            ienw =      1,
-            iene =      1,
-            jens =      1,
-            jenn =      1,
+! Kill trajectories reaching the Rhone outflow channel
+            nend =      1,
+            ienw =      0,
+            iene =      4,
+            jens =      0,
+            jenn =     64,
            timax = 36500.0,
 /
 &INIT_TEMP_SALT

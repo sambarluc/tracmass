@@ -17,7 +17,7 @@ SUBROUTINE loop
   USE mod_param,    only: ntracmax, undef, tday 
   USE mod_loopvars, only: dse, dsw, dsmin, ds, dsu, dsd, dsn, dss, &
                           niter, lbas, scrivi, subvol
-  USE mod_grid,     only: imt, jmt, km, kmt, dyu, dxv, dxdy, dxyz, dz, dzt, &
+  USE mod_grid,     only: imt, jmt, km, kmt, kmtb, dyu, dxv, dxdy, dxyz, dz, dzt, &
                           mask, iter, nsm, nsp, hs, calc_dxyz, nperio !joakim
   use mod_vel,      only: uflux, vflux, wflux
   USE mod_seed,     only: ff, nff, seedTime, seed
@@ -704,6 +704,9 @@ return
           ! if trajectory under bottom of ocean, 
           ! then put in middle of deepest layer 
           ! (this can happen when using time dependent vertical coordinates)
+          !CA Apparently, this is the right condition also for MITgcm shaved cells
+          !CA Using the fractional number of active cells leads to apparently
+          !CA spurious "below bottom" errors. Why? Not clear.
            if( z1.le.dble(KM-kmt(ib,jb)) ) then
               print *,'Particle below bottom',z1,dble(KM-kmt(ib,jb))
               print *,'x1,y1',x1,y1

@@ -277,6 +277,7 @@ SUBROUTINE init_params
       ALLOCATE ( phi(0:jmt),   zlev(0:km) ) 
 #ifdef MITgcm
       ALLOCATE ( dyt(jmt), dxv(imt,0:jmt), dyu(0:imt,jmt) ) 
+      ALLOCATE ( kmtb(imt, jmt) ) ! To allow for fractional bottom cells
 #else
       ALLOCATE ( dyt(jmt), dxv(imt+2,jmt), dyu(imt+2,jmt) ) 
 #endif

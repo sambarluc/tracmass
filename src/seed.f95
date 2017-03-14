@@ -15,7 +15,7 @@ MODULE mod_seed
 !!------------------------------------------------------------------------------
 
    USE mod_time,  only    : ints, ntime, tseas, tt, ts, partQuant, intstart,nff
-   USE mod_grid,  only    : imt, jmt, km, kmt, nsm, mask, dz, dzt
+   USE mod_grid,  only    : imt, jmt, km, kmt, kmtb, nsm, mask, dz, dzt
    USE mod_vel,   only    : uflux, vflux, wflux, ff
    USE mod_traj!,  only    : ntractot, ntrac, ib, jb, kb, x1, y1, z1, trj, nrj
    USE mod_write, only    : writedata
@@ -164,17 +164,6 @@ CONTAINS
 #else
             vol = dz(kb)
 #endif /*zgrid*/
-!#ifdef varbottombox
-!            IF (kb == KM+1-kmt(ib,jb)) THEN
-!               vol = dztb (ib,jb,1)
-!            END IF
-!#endif /*varbottombox*/
-!#ifdef freesurface
-!            IF (kb == KM) THEN
-!               vol = vol+hs(ib,jb,nsm)
-!            END IF
-!            vol = vol*dxdy(ib,jb)*1.e-6  ! volume in millions of m3
-!#endif /*freesurface*/
 
          END IF
           
@@ -260,6 +249,12 @@ CONTAINS
                      z1 = seed_xyz (jsd,3)
 
                   END SELECT
+!CA It could still happen that z1 is below the bottom with MITgcm shaved cells
+#ifdef MITgcm
+               IF (z1.LE.(KM-kmtb(ib,jb))) THEN
+                  CYCLE kkkLoop
+               END IF
+#endif
                   ! ------------------------------------------------------
                   ! --- Check properties of water mass at initial time ---
                   ! ------------------------------------------------------ 
