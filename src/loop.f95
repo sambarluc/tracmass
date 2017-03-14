@@ -613,8 +613,8 @@ return
 
        case ('boundError')
           if(ia<1 .or. ia>imt .or. ib<1 .or. ib>imt .or.    &
-             ja<1 .or. ja>jmt .or. jb<1 .or. jb>jmt .or.    &
-             y0<1 .or. y0>jmt .or. y1<1 .or. y1>jmt         &
+             ja<1 .or. ja>jmt .or. jb<1 .or. jb>jmt         &
+!CA             y0<1 .or. y0>jmt .or. y1<1 .or. y1>jmt         &
              ) then
              if (verbose == 1) then
                 print *, thickline !========================================
