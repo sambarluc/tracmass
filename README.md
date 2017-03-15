@@ -1,45 +1,14 @@
-TRACMASS is a Lagrangian trajectory code for ocean and atmospheric general circulation models. The code makes it possible to estimate water paths, Lagrangian stream functions (barotropic and overturning), exchange times, particle sedimentation, etc. TRACMASS has been used in studies of the global ocean circulation, of sea circulation in The Baltic, The Mediterranean and in coastal regions.
+Tracmass - MITgcm
+=================
 
-The code is written in FORTRAN 95 with modules and runs on UNIX platforms such as MAC OS X and Linux.
+This is a fork of the TRACMASS Lagrangian trajectory code.
 
-TRACMASS has been set up to run with velocities integrated with models such as NEMO, ORCA, ROMS, POM, MICOM, IFS-ECMWF and EC-Earth.
+The aim of this fork is to adapt TRACMASS to work with MITgcm binary output, and its shaved cells in the vertical. The code has also been stripped of all calendar functionality, since it easily lead to conflicts with MITgcm own calendar (the code obviously still keeps track of time).
 
-Andrea Cimatoribus: Adapted code to work with binary MITgcm output. Stripped the code of all calendar functionality. That is done
-in the GCM and doing it a second time is only a source of confusion.
+The fork has been tested on cartesian rectangular and curvilinear MITgcm grids, following several thousands particles for several weeks. No particle hit the boundary, provided a sufficiently high number of intermediate iterations between GCM outputs was used.
 
+The time analytic scheme was tested, modifying the code in a few places to deal with the full 3D flow, but the code tends to produce underflow errors. I did not investigate the cause since the standard iteration method gives good results. I suspect the issue is a trivial one (which does not mean that the solution is trivial).
 
-Quickstart
-==========
+The fork also contains a python module which reads the TRACMASS output and presents it in an easy to access format based on xarray data objects. Ideally, in the future I will write some pyhton interface between MITgcm and TRACMASS, in particular to set the simulation time in a more streamlined way.
 
-Prerequisites to run on Mac OS X
---------------------------------
-
-Download and install macports (www.macports.org)
-Install the following ports:
-
-```sh
-sudo port install openmpi +gcc45 +valgrind
-sudo port install netcdf +openmpi +netcdf4 
-sudo port install netcdf-fortran +gcc45 +openmpi
-sudo port install git-core 
-sudo port install git-extras
-```
-
-
-Compile the code
-----------------
-Copy Makefile_tmpl to Makefile. Choose a change PROJECT and CASE in Makefile to your projectname.
-
-run:
-
-```bash
-make
-./runtrm
-```
-
-
-Change log
-==========
-
-
-6.0.0 First public release
+Comments, suggestions, bug reports, etc. are welcome. To do so please open an issue.
