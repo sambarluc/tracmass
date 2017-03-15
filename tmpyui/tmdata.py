@@ -1,11 +1,12 @@
 from __future__ import division, print_function
 
 
-def tmdata(mitdir, tmtracks, tstart, inds=False, **xmgcm):
+def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     """
     mitdir:    Path to the MITgcm simulations results, used to load the grid information.
     tmdir:     File containing the Lagrangian tracks computed by tracmass.
     tstart:    Beginning time of the simulation, as a string with format "2010-01-24 12:20"
+    ids:       Particle id numbers to load. If None (default), all particles are loaded
     inds:      Return tracks as indices too, default: False.
     **xmgcm:   Keywords arguments passed to xmgcm.mitgcmds to load MITgcm grid files.
 
@@ -73,8 +74,13 @@ def tmdata(mitdir, tmtracks, tstart, inds=False, **xmgcm):
         print("Something is wrong in the size of the tracmass file.")
         tmbin = tmbin[:(tmbin.size//5)*5]
     tmbin = np.reshape(tmbin, (tmbin.size//5, 5))
-    ids = np.unique(np.int32(tmbin[:, 0]))
-    ntracks = ids.size
+    all_ids = np.unique(np.int32(tmbin[:, 0]))
+    if ids is None:
+        ntracks = all_ids.size
+        ids = all_ids
+    else:
+        ids = np.atleast_1d(np.squeeze(ids))
+        ntracks = np.size(ids)
     tsteps = np.datetime64(tstart) + \
              np.asarray(tmbin[:, 1]*86400, dtype="timedelta64[s]")
     tcoord = np.unique(tsteps)
