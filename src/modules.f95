@@ -15,7 +15,7 @@ MODULE mod_param
   INTEGER                                   :: ncoor,kriva,iter,ngcm
   REAL(DP)                                  :: dtgcm
   REAL(DP), PARAMETER                       :: UNDEF=1.d20 
-  REAL(DP), PARAMETER                       :: EPS=1.d-7 ! the small epsilon
+  REAL(DP), PARAMETER                       :: EPS=1.d-8 ! the small epsilon
 
   REAL(DP), PARAMETER                       :: grav = 9.81
   REAL(DP), PARAMETER                       :: PI = 3.14159265358979323846d0
