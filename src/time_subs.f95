@@ -160,10 +160,17 @@ elseif(ijk==3) then
  ii=ka
  iim=ka-1
  iil=iim
+#if defined  explicit_w || full_wflux
+ uu=wflux(ia ,ja ,ii ,nsm)
+ um=wflux(ia ,ja ,iil,nsm)
+ vv=wflux(ia ,ja ,ii ,nsp)
+ vm=wflux(ia ,ja ,iil,nsp)
+#else
  uu=wflux(ii ,nsm)
  um=wflux(iil,nsm)
  vv=wflux(ii ,nsp)
  vm=wflux(iil,nsp)
+#endif /*explicit_w || full_wflux*/
 #ifdef turb   
  if(r0/=dble(ii)) then
   vv=vv+upr( 5,2)  
@@ -374,10 +381,17 @@ elseif(ijk==3) then
  ii=ka
  iim=ka-1
  iil=iim
+#if defined  explicit_w || full_wflux
+ uu=wflux(ia ,ja ,ii ,nsm)
+ um=wflux(ia ,ja ,iil,nsm)
+ vv=wflux(ia ,ja ,ii ,nsp)
+ vm=wflux(ia ,ja ,iil,nsp)
+#else
  uu=wflux(ii ,nsm)
  um=wflux(iil,nsm)
  vv=wflux(ii ,nsp)
  vm=wflux(iil,nsp)
+#endif /*explicit_w || full_wflux*/
 #ifdef turb   
  if(r0/=dble(ii)) then
   vv=vv+upr( 5,2)  
