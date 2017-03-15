@@ -707,16 +707,18 @@ return
           !CA Apparently, this is the right condition also for MITgcm shaved cells
           !CA Using the fractional number of active cells leads to apparently
           !CA spurious "below bottom" errors. Why? Not clear.
-           if( z1.le.dble(KM-kmt(ib,jb)) ) then
-              print *,'Particle below bottom',z1,dble(KM-kmtb(ib,jb))
-              print *,'x1,y1',x1,y1
-              print *,'ntrac=',ntrac,niter 
-              nerror=nerror+1
- !             nrj(6,ntrac)=1
-              stop 3957
-              z1=dble(KM-kmt(ib,jb))+0.5d0
-              errCode = -49
-           end if
+          if( z1.le.dble(KM-kmt(ib,jb)) ) then
+            print *,'Particle below bottom',z1,dble(KM-kmtb(ib,jb))
+            print *,'x1,y1',x1,y1
+            print *,'ia,ja',ia,ja
+            print *,'ib,jb',ib,jb
+            print *,'ntrac=',ntrac,niter 
+            nerror=nerror+1
+          !             nrj(6,ntrac)=1
+            stop 3957
+            z1=dble(KM-kmt(ib,jb))+0.5d0
+            errCode = -49
+          end if
         case ('airborneError')
            ! if trajectory above sea level,
            ! then put back in the middle of shallowest layer (evaporation)

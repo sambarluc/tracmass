@@ -22,7 +22,6 @@ contains
     INTEGER                                    :: ia, iam, ja, ka,k
     INTEGER                                    :: ib, jb, kb
     REAL                                       :: temp,salt,dens
-    REAL(DP)                                   :: dza,dzb, zz
     REAL(DP), INTENT(IN)                       :: x0, y0, z0
     REAL(DP), INTENT(OUT)                      :: x1, y1, z1
       
