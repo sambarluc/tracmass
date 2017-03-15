@@ -149,7 +149,7 @@ CONTAINS
     write(6,FMT='(A,I5)') ' Length of run in GCM output steps : ' ,intrun
     write(6,FMT='(A,I5)') ' Number of seeding timesteps       : ' ,intspin
     write(6,FMT='(A,I5)') ' Steps between two GCM fields      : ' ,iter
-    write(6,FMT='(A,I5)') ' Initial GCM time step             : ' ,intmin
+    write(6,FMT='(A,I10.10)') ' Initial GCM time step             : ' ,intmin
 
 
     print *, thinline !--------------------------------------------------- 
