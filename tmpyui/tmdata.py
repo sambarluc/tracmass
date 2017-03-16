@@ -82,7 +82,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
         ids = np.atleast_1d(np.squeeze(ids))
         ntracks = np.size(ids)
     tsteps = np.datetime64(tstart) + \
-             np.asarray(tmbin[:, 1]*86400, dtype="timedelta64[s]")
+             np.asarray(tmbin[:, 1]*86400, dtype="timedelta64[ns]")
     tcoord = np.unique(tsteps)
 
     tracks = xr.Dataset()
