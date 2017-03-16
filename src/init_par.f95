@@ -230,7 +230,7 @@ SUBROUTINE init_params
       intmax = intmin - intrun
    end if
    
-   tseas = dble(ngcm)*3600.d0
+   tseas = ngcm*3600.d0
    dtmin =  dstep * tseas
 
    ! --- ist -1 to imt ---

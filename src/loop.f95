@@ -329,6 +329,8 @@ SUBROUTINE loop
            call pos(ia,iam,ja,ka,ib,jb,kb,x0,y0,z0,x1,y1,z1)
            !call errorCheck('longjump', errCode)
            
+           !CA === BEGIN PERIODICITY STUFF ===
+
            if (nperio == 6) then
               ! === north fold cyclic for the ORCA grids ===
               if( y1 == dble(JMT-1) ) then ! North fold for ntrac
@@ -396,6 +398,8 @@ SUBROUTINE loop
               endif
               if(ib > IMT      ) ib=ib-IMT 
            end if
+
+           !CA === END PERIODICITY STUFF ===
            
            ! === make sure that trajectory ===
            ! === is inside ib,jb,kb box    ===

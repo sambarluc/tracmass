@@ -12,8 +12,8 @@ MODULE mod_param
   USE mod_precdef
   INTEGER                                   :: jmax, ntracmax
   INTEGER, PARAMETER                        :: MR=501 ! or 1001
-  INTEGER                                   :: ncoor,kriva,iter,ngcm
-  REAL(DP)                                  :: dtgcm
+  INTEGER                                   :: ncoor,kriva,iter
+  REAL(DP)                                  :: dtgcm, ngcm
   REAL(DP), PARAMETER                       :: UNDEF=1.d20 
   REAL(DP), PARAMETER                       :: EPS=1.d-8 ! the small epsilon
 
@@ -87,7 +87,8 @@ MODULE mod_grid
   INTEGER                                   :: nst=2
   INTEGER                                   :: nsm=1,  nsp=2
   INTEGER                                   :: wnsm=1, wnsp=2
-  INTEGER                                   :: nperio=1
+  !CA If nperio > 0 use periodicity
+  INTEGER                                   :: nperio=0
   REAL(DP)                                  :: dx,dy
   REAL(DP)                                  :: dxdeg,dydeg,stlon1,stlat1
   REAL*4, ALLOCATABLE, DIMENSION(:,:,:)   :: hs
@@ -213,11 +214,11 @@ CONTAINS
     IMPLICIT NONE
     ttpart = anint((anint(tt,8)/tseas-floor(anint(tt,8)/tseas))*tseas)/tseas
 
-    currJDtot = (ints+ttpart)*(dble(ngcm)/24.)
+    currJDtot = (ints+ttpart)*(ngcm/24.)
     
     loopints = ints - intstart
 
-    loopJD = (loopints + ttpart)*(dble(ngcm)/24)
+    loopJD = (loopints + ttpart)*(ngcm/24)
     loopDay  = int(loopJD)
     loopJD = (loopJD - dble(loopDay)) * 24.0
     loopHour = int(loopJD,8)
@@ -229,7 +230,7 @@ CONTAINS
   INTEGER function jd2ints(jd)
     USE mod_param, only: ngcm
     REAL(DP) :: jd
-    jd2ints = nint((jd)/(real(ngcm)/24.))
+    jd2ints = nint((jd)/(ngcm/24.))
     return
   end function jd2ints
   

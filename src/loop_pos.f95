@@ -19,7 +19,7 @@ contains
     INTEGER                                    :: mra,mta,msa
     INTEGER                                    :: mrb,mtb,msb
     REAL                                       :: uu
-    INTEGER                                    :: ia, iam, ja, ka,k
+    INTEGER                                    :: ia, iam, ja, ka,kk
     INTEGER                                    :: ib, jb, kb
     REAL                                       :: temp,salt,dens
     REAL(DP), INTENT(IN)                       :: x0, y0, z0
@@ -30,7 +30,12 @@ contains
     scrivi=.false.
     if(ds==dse) then ! eastward grid-cell exit 
        scrivi=.false.
+       !CA The definition of the fluxes at the cell edges is different for MITgcm
+#ifdef MITgcm
+       uu=(intrpbg*uflux(ia+1,ja,ka,nsp)+intrpb*uflux(ia+1,ja,ka,nsm))*ff
+#else
        uu=(intrpbg*uflux(ia,ja,ka,nsp)+intrpb*uflux(ia ,ja,ka,nsm))*ff
+#endif
        if(uu.gt.0.d0) then
           ib=ia+1
           if(ib.gt.IMT) ib=ib-IMT 
@@ -80,7 +85,11 @@ contains
         
     elseif(ds==dsw) then ! westward grid-cell exit
        scrivi=.false.
+#ifdef MITgcm
+       uu=(intrpbg*uflux(ia,ja,ka,nsp)+intrpb*uflux(ia,ja,ka,nsm))*ff
+#else
        uu=(intrpbg*uflux(iam,ja,ka,nsp)+intrpb*uflux(iam,ja,ka,nsm))*ff
+#endif
        if(uu.lt.0.d0) then
           ib=iam
        endif
@@ -129,7 +138,11 @@ contains
 
     elseif(ds==dsn) then ! northward grid-cell exit
        scrivi=.false.
+#ifdef MITgcm
+       uu=(intrpbg*vflux(ia,ja+1,ka,nsp)+intrpb*vflux(ia,ja+1,ka,nsm))*ff
+#else
        uu=(intrpbg*vflux(ia,ja,ka,nsp)+intrpb*vflux(ia,ja,ka,nsm))*ff
+#endif
        if(uu.gt.0.d0) then
           jb=ja+1
        endif
@@ -177,7 +190,11 @@ contains
 
     elseif(ds==dss) then ! southward grid-cell exit
        scrivi=.false.
+#ifdef MITgcm
+       uu=(intrpbg*vflux(ia,ja,ka,nsp)+intrpb*vflux(ia,ja,ka,nsm))*ff
+#else
        uu=(intrpbg*vflux(ia,ja-1,ka,nsp)+intrpb*vflux(ia,ja-1,ka,nsm))*ff
+#endif
        if(uu.lt.0.d0) then
           jb=ja-1
 #ifndef ifs 
@@ -228,11 +245,16 @@ contains
        
     elseif(ds==dsu) then ! upward grid-cell exit
        scrivi=.false.
-       call vertvel(ia,iam,ja,ka)
-#if defined explicit_w || full_wflux
-       uu=wflux(ia,ja,ka,nsm)
+#ifdef MITgcm
+    kk = ka + 1
 #else
-       uu=intrpbg*wflux(ka,nsp)+intrpb*wflux(ka,nsm)
+    kk = ka
+#endif
+       call vertvel(ia,iam,ja,kk)
+#if defined explicit_w || full_wflux
+       uu=wflux(ia,ja,kk,nsm)
+#else
+       uu=intrpbg*wflux(kk,nsp)+intrpb*wflux(kk,nsm)
 #endif
        if(uu.gt.0.d0) then
           kb=ka+1
@@ -271,12 +293,17 @@ contains
 
     elseif(ds==dsd) then ! downward grid-cell exit
        scrivi=.false.
-       call vertvel(ia, iam, ja, ka)
+#ifdef MITgcm
+    kk = ka
+#else
+    kk = ka - 1
+#endif
+       call vertvel(ia, iam, ja, kk)
      
 #if defined explicit_w || full_wflux
-       if(wflux(ia,ja,ka-1,nsm).lt.0.d0) kb=ka-1
+       if(wflux(ia,ja,kk,nsm).lt.0.d0) kb=ka-1
 #else
-       if(intrpbg*wflux(ka-1,nsp)+intrpb*wflux(ka-1,nsm).lt.0.d0) kb=ka-1
+       if(intrpbg*wflux(kk,nsp)+intrpb*wflux(kk,nsm).lt.0.d0) kb=ka-1
 #endif              
        z1=dble(ka-1)
 #if defined timeanalyt
