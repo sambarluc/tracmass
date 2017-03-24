@@ -85,7 +85,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
              np.asarray(tmbin[:, 1]*86400, dtype="timedelta64[s]").astype("timedelta64[ns]")
     tcoord = np.unique(tsteps)
 
-    tracks = xr.Dataset()
+    tracks = grid.drop(grid.data_vars.keys())
     tracks.attrs["MITgcm_dir"] = mitdir
     tracks.attrs["tracmass_file"] = tmtracks
     tracks.coords["id"] = ("id", ids)
