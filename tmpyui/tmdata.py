@@ -5,7 +5,8 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     """
     mitdir:    Path to the MITgcm simulations results, used to load the grid information.
     tmdir:     File containing the Lagrangian tracks computed by tracmass.
-    tstart:    Beginning time of the simulation, as a string with format "2010-01-24 12:20"
+    tstart:    Beginning time of the MITgcm simulation, as a string with
+               format "2010-01-24 12:20"
     ids:       Particle id numbers to load. If None (default), all particles are loaded
     inds:      Return tracks as indices too, default: False.
     **xmgcm:   Keywords arguments passed to xmgcm.mitgcmds to load MITgcm grid files.
