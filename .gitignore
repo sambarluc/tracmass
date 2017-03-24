@@ -1,4 +1,5 @@
 *.o
+*.nc
 *.mod
 *.pyc
 *.log
