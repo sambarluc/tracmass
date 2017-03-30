@@ -73,7 +73,7 @@ CONTAINS
       END IF
       
       !What is this line for??? Seed every eight days!!!
-      if ((ints-intstart-1)/8 .ne. real((ints-intstart-1))/8) return
+      !if ((ints-intstart-1)/8 .ne. real((ints-intstart-1))/8) return
       
       ! ---------------------------------------
       ! --- Loop over the seed size, nsdMax ---
