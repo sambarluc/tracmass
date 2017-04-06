@@ -21,7 +21,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     from xmitgcm import open_mdsdataset as mitgcmds
 
     xmgcm["swap_dims"] = False
-    grid = mitgcmds(mitdir, read_grid=True, **xmgcm)
+    grid = mitgcmds(mitdir, read_grid=True, iters=[], **xmgcm)
 
     if "geometry" in xmgcm.keys():
         if xmgcm["geometry"]=="curvilinear":
