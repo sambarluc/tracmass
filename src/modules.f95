@@ -381,7 +381,7 @@ MODULE mod_name
   CHARACTER(LEN=200)                         :: gridName  ,gridSource
   CHARACTER(LEN=200)                         :: gridDesc
   CHARACTER (LEN=23)                         :: Project, Case
-  CHARACTER(LEN=200)                         :: caseName  ,caseDesc
+  CHARACTER(LEN=200)                         :: caseNum  ,caseDesc
 ENDMODULE mod_name
 ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
 

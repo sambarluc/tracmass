@@ -52,7 +52,7 @@ CONTAINS
     print *,'Start time  : 0.0s' ! the model always starts from 0 
     print *,'Model code  : '//trim(GCMname)
     print *,'Data surce  : '//trim(gridName)
-    print *,'Run name    : '//trim(caseName)
+    print *,'Run name    : '//trim(caseNum)
     print *,'Description : '//trim(caseDesc)
     print *, thinline !--------------------------------------------------- 
     print *,'Directory for output files : ' ,trim(outDataDir)
@@ -238,7 +238,7 @@ CONTAINS
     print *,'End time  : '//currTime(1:2)// ':'//currTime(3:4)// ':'//currTime(5:6)
 
 
-    print *,'The very end of TRACMASS run ',caseName
+    print *,'The very end of TRACMASS run ',caseNum
 
   end subroutine print_end_loop
 

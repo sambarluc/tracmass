@@ -2,7 +2,7 @@
 module mod_write
 
   USE mod_time, only: intstart,ints
-  USE mod_name, only: casename, case, Project
+  USE mod_name, only: case, caseNum, Project
   USE mod_time 
  ! USE mod_traj, only: ib,jb,kb
 
@@ -34,7 +34,8 @@ CONTAINS
     end if
     if (outdircase .eqv. .true.) THEN
        outDataDir = trim(outDataDir) // trim(Project) // '/'
-       outDataDir = trim(outDataDir) // 'results/' // trim(Case) // '/'
+       outDataDir = trim(outDataDir) // 'results/' // trim(Case)
+       outDataDir = trim(outDataDir) // trim(caseNum) // '/'
     END IF
     if (outdirdate .eqv. .true.) then
        yearstr = 'XXXXXXXXXX'

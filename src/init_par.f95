@@ -1,5 +1,5 @@
 SUBROUTINE init_params
-! Loads parameters from the namelists (projname).in and (casename).in.
+! Loads parameters from the namelists (projname).in
 ! Allocates matrices and set time variables.
 
    USE mod_param
@@ -37,7 +37,7 @@ SUBROUTINE init_params
    namelist /INIT_NAMELIST_VERSION/ gridVerNum
    namelist /INIT_GRID_DESCRIPTION/ GCMname, GCMsource, gridName, gridSource,&
                                     griddesc, inDataDir!, topoDataDir !!joakim
-   namelist /INIT_CASE_DESCRIPTION/ caseName, caseDesc
+   namelist /INIT_CASE_DESCRIPTION/ caseNum, caseDesc
    namelist /INIT_GRID_SIZE/        imt, jmt, km, nst, subGrid, subGridImin, &
                                     subGridImax, subGridJmin, subGridJmax,   &
                                     subGridKmin, subGridKmax, SubGridFile,   &
