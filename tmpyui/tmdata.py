@@ -158,4 +158,4 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
         tracks["ztrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
-    return tracks
+    return tracks.where(np.isfinite(tracks.xtrack))
