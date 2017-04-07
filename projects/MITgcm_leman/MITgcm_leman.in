@@ -37,7 +37,7 @@
             ngcm    =     0.5,
             dtgcm   =      20,
             intmin  = 3283290,
-            intspin =       1,
+            intspin =    4320,
             endJD   =      90,
             iter    =     900,
 /
@@ -89,10 +89,10 @@
 !                 2 = Use a list to define which cells to seed.
 !                 3 = Use a 2-D mask file.
         seedtype =      1,
-            ist1 =    310,
-            ist2 =    313,
-            jst1 =      4,
-            jst2 =     12,
+            ist1 =    309,
+            ist2 =    309,
+            jst1 =     10,
+            jst2 =     10,
 ! k goes from 1 (bottom) upwards
             kst1 =      5,
             kst2 =     35,
@@ -106,7 +106,7 @@
         seedtime =      0,
 ! 1: All particles are seeded at each seeding time step
 ! 2: Each seed position is used once
-         seedall =      0,
+         seedall =      1,
 ! 1: seed at i,j,k positions
 ! 2: seed at x,y,z positions (?)
          seedpos =      1,
@@ -117,7 +117,7 @@
 ! Kill trajectories reaching the Rhone outflow channel
             nend =      1,
             ienw =      0,
-            iene =      4,
+            iene =      3,
             jens =      0,
             jenn =     64,
            timax = 36500.0,
