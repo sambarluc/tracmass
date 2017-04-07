@@ -245,11 +245,9 @@ contains
        
     elseif(ds==dsu) then ! upward grid-cell exit
        scrivi=.false.
-#ifdef MITgcm
-    kk = ka + 1
-#else
-    kk = ka
-#endif
+
+       kk = ka
+
        call vertvel(ia,iam,ja,kk)
 #if defined explicit_w || full_wflux
        uu=wflux(ia,ja,kk,nsm)
@@ -293,11 +291,9 @@ contains
 
     elseif(ds==dsd) then ! downward grid-cell exit
        scrivi=.false.
-#ifdef MITgcm
-    kk = ka
-#else
-    kk = ka - 1
-#endif
+
+       kk = ka - 1
+
        call vertvel(ia, iam, ja, kk)
      
 #if defined explicit_w || full_wflux
