@@ -89,7 +89,7 @@ SUBROUTINE init_params
       end if
    end if
 
-   OPEN (8,file=trim(projdir)//'/'//trim(Project)//'.in',    &
+   OPEN (8,file=trim(projdir)//'/'//trim(Case)//'.in',    &
         & status='OLD', delim='APOSTROPHE')
    ! -- Check if the namefiles has correct version number. 
    READ (8,nml=INIT_NAMELIST_VERSION)

@@ -56,13 +56,13 @@ class tmsim(object):
         ii, jj, kk: list, array, or scalar with indices (i, j, k) from which
                     particles will be released (must be integers).
         """
-        self.ii = np.atleast_1d(ii)
+        self.ii = np.squeeze(np.atleast_1d(ii))
         if not np.issubdtype(self.ii.dtype, np.integer):
             raise TypeError("Indices must be integers (i-indices).")
-        self.jj = np.atleast_1d(jj)
+        self.jj = np.squeeze(np.atleast_1d(jj))
         if not np.issubdtype(self.jj.dtype, np.integer):
             raise TypeError("Indices must be integers (j-indices).")
-        self.kk = np.atleast_1d(kk)
+        self.kk = np.squeeze(np.atleast_1d(kk))
         if not np.issubdtype(self.kk.dtype, np.integer):
             raise TypeError("Indices must be integers (k-indices).")
 
