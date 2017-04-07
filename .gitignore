@@ -4,6 +4,8 @@
 *.pyc
 *.log
 *.txt
+*.png
+*.bin
 results
 runtraj
 runtracmass
