@@ -81,9 +81,7 @@ SUBROUTINE init_params
       CALL getarg(2, Case)
    END IF
    
-   CALL getenv('TRMPROJDIR',projdir)
    if (len(trim(projdir)) == 0) then
-      CALL getenv('TRMDIR',ormdir)
       if (len(trim(ormdir)) .ne. 0) then
          projdir = trim(ormdir)//'/'//'projects/'//trim(Project)//'/'
       else
@@ -185,30 +183,6 @@ SUBROUTINE init_params
    start3d  = [1, subGridImin, subGridJmin, subGridKmin]
    count3d  = [1, imt,         jmt,         km         ]
    
-   if ((IARGC() > 2) )  then
-      ARG_INT1 = 0.1
-      CALL getarg(2,inparg)
-      if ( ARG_INT1 == 0) then
-         read( inparg, '(i15)' ) ARG_INT1
-         write( inargstr1, '(A,i9.9 )' ) '_a',ARG_INT1
-      else
-         read( inparg, '(f15.10)' ) ARG_INT1
-         write( inargstr1, '(A,i9.9 )' ) '_a',int(ARG_INT1)
-      end if
-   end if
-      
-   IF ((IARGC() > 3) ) THEN
-      ARG_INT2 = 0.1
-      CALL getarg(3,inparg)
-      if ( ARG_INT2 == 0) then
-         read( inparg, '(i15)' ) ARG_INT2
-         write( inargstr2, '(A,i9.9)' ) '_b',ARG_INT2
-      else
-         read( inparg, '(f15.10)' ) ARG_INT2
-         write( inargstr2, '(A,i9.9)' ) '_b',int(ARG_INT2)
-      end if
-   end if
-   
    IF (endJD < startJD) then
       PRINT *,'==================== ERROR ===================='
       PRINT *,'End JD must be positive, number of days to run.'
@@ -254,14 +228,6 @@ SUBROUTINE init_params
    IF ( kst2 == -1) THEN 
       kst2 = KM
    END IF
-
-   if (len(trim(inDataDir)) == 0) then
-      CALL getenv('TRMINDATADIR', projdir)
-      if (len(trim(projdir)) .ne. 0) then
-         print *, 'Using indatdir defined by TRMINDATADIR'
-         inDataDir = trim(projdir) // trim(Project) // '/'
-      end if
-   end if
 
    call setup_outdatadir
       

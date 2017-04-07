@@ -2,7 +2,6 @@ from __future__ import division, print_function
 import numpy as np
 from xmitgcm import open_mdsdataset as mitgcmds
 from os.path import join, isfile
-from os import access, X_OK
 from time import sleep
 
 
@@ -14,29 +13,30 @@ class tmsim(object):
     """
     _empty = np.array([], int)
 
-    def __init__(self, tmexe, projdir, ptemplate, inname):
+    def __init__(self, basedir, projdir, ptemplate, inname):
         """
         Define a tmsim object.
-        tmexe:        full path to the tracmass "runtrm" executable
+        basedir:      base directory, where the "runtrm" executable
+                      and the "projects" directory are found.
         projdir:      directory of tracmass project template,
                       containing namelist, radgrid, etc.
+                      (to be found inside the "projects" subdirectory)
         ptemplate:    template file with namelist for tracmass,
                       this will be edited to split the computation
                       over multiple cpus.
-        inname:       filename of the tracmass namelist
+        inname:       filename of the tracmass namelist, which will be
+                      fed to the executable
         """
         
-        if not tmexe.endswith("runtrm"):
-            tmexe = join(tmexe, "runtrm")
+        tmexe = join(basedir, "runtrm")
         if not isfile(tmexe):
             raise ValueError("Cannot find 'runtrm' executable.")
-        if not access(tmexe, X_OK):
-            raise ValueError("The given 'runtrm' is not executable.")
         self.exepath = tmexe
 
-        with open(join(projdir, ptemplate), 'r') as f:
+        with open(join(basedir, "projects", projdir, ptemplate), 'r') as f:
             self._infile = f.readlines()
-        self.projdir = projdir
+        self.project = projdir
+        self.projdir = join(basedir, "projects", projdir)
 
         inname = inname.rstrip()
         if inname.endswith(".in"):
@@ -105,7 +105,8 @@ class tmsim(object):
             f.writelines(nml)
             f.close()
             # start tracmass
-            procs.append(Popen([self.exepath],
+            procs.append(Popen([self.exepath, self.project,
+                                self.nmlname[:-3]],
                                stdout=outf[nproc], stderr=outf[nproc]))
             ijkproc.append(ijk)
             # sleep to let the process start and read the namelist

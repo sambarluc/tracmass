@@ -24,13 +24,7 @@ CONTAINS
   subroutine setup_outdatadir
 
     if (len(trim(outDataDir)) == 0) then
-       CALL getenv('TRMOUTDATADIR', projdir)
-       if (len(trim(projdir)) .ne. 0) then
-          print *, 'Using outdatdir defined by TRMOUTDATADIR'
-          outDataDir = trim(projdir) // trim(Project) 
-       ELSE
-          outDataDir = 'projects/'
-       end if
+       outDataDir = 'projects/'
     end if
     if (outdircase .eqv. .true.) THEN
        outDataDir = trim(outDataDir) // trim(Project) // '/'

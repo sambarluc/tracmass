@@ -65,7 +65,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
             yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :]
             yG[:, -1] = yG[:, -2]
     else:
-        raise ValueError("Tell explicitely the grid geometry.")
+        raise ValueError("Grid geometry not recognised.")
 
     # tracmass has opposite Z order, Zu is the lower interface
     Z = grid.Zp1[::-1].to_masked_array()
