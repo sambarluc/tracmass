@@ -61,7 +61,7 @@ CONTAINS
     print *,"Selected compile options:"
 
 #if defined MITgcm
-    print *,' MITgcm configuration of grids'
+    print *,' - MITgcm configuration of grids'
 #endif
 
 #if defined zgrid3Dt
