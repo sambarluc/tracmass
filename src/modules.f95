@@ -293,11 +293,7 @@ CONTAINS
 #endif /*regulardt*/
     end if
     ! === time interpolation constant ===
-#if defined fixedtimestep 
-    intrpbg=0.d0 ! mimics Ariane's lack of linear interpolation of the velocity fields
-#else    
     intrpbg=dmod(ts,1.d0) 
-#endif
     intrpb =1.d0-intrpbg
   end subroutine calc_time
 
