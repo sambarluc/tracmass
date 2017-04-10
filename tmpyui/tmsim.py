@@ -88,6 +88,14 @@ class tmsim(object):
 
         from subprocess32 import Popen
 
+        def check_active(procs):
+            # check which processes are running
+            active = []
+            for p in procs:
+                if p.poll() is None:
+                    active.append(p)
+            return active, len(active)
+
         self._decompose(ncpu)
 
         procs = []
@@ -115,13 +123,14 @@ class tmsim(object):
             if ncpu > 1:
                 sleep(0.5)
             # check which processes are running
-            active = []
-            for n,p in zip(ijkproc, procs):
-                if p.poll() is None:
-                    active.append(p)
-            # wait if there are too many active
-            if len(active) >= ncpu:
-                active[0].wait()
+            active, na = check_active(procs)
+            while na >= ncpu:
+                # if we wait for a specific process to finish,
+                # we may leave one or more CPUs empty even for
+                # long time. This is certainly not professional
+                # but works.
+                sleep(5)
+                active, na = check_active(procs)
 
         # wait for all to finish and store exit code
         self.exit = {}
