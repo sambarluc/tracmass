@@ -706,14 +706,12 @@ return
           ! if trajectory under bottom of ocean, 
           ! then put in middle of deepest layer 
           ! (this can happen when using time dependent vertical coordinates)
-          !CA Apparently, this is the right condition also for MITgcm shaved cells
-          !CA Using the fractional number of active cells leads to apparently
-          !CA spurious "below bottom" errors. Why? Not clear.
           if( z1.le.dble(KM-kmt(ib,jb)) ) then
-            print *,'Particle below bottom',z1,dble(KM-kmtb(ib,jb))
+            print *,'Particle below bottom',z1,dble(KM-kmt(ib,jb))
+            print *,'kmt, kmtb',kmt(ib,jb),kmtb(ib,jb)
             print *,'x1,y1',x1,y1
-            print *,'ia,ja',ia,ja
-            print *,'ib,jb',ib,jb
+            print *,'ia,ja,ka',ia,ja,ka
+            print *,'ib,jb,kb',ib,jb,kb
             print *,'ntrac=',ntrac,niter 
             nerror=nerror+1
           !             nrj(6,ntrac)=1
