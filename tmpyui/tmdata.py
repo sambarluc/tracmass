@@ -98,6 +98,14 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     tracks.attrs["tracmass_file"] = tmtracks
     tracks.coords["id"] = ("id", ids)
     tracks.coords["time"] = ("time", np.unique(tsteps))
+    tracks["xG_p1"] = xr.DataArray(xG,
+                                   coords={"j_p1": np.arange(xG.shape[0]),
+                                           "i_p1": np.arange(xG.shape[1])},
+                                           dims=["j_p1", "i_p1"])
+    tracks["yG_p1"] = xr.DataArray(yG,
+                                   coords={"j_p1": np.arange(xG.shape[0]),
+                                           "i_p1": np.arange(xG.shape[1])},
+                                           dims=["j_p1", "i_p1"])
     tracks["xtrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
                                          coords={"id": ids,
                                                  "time": tcoord},
@@ -167,4 +175,4 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
         tracks["ztrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
-    return tracks.where(np.isfinite(tracks.xtrack))
+    return tracks
