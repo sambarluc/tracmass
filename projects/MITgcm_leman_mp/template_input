@@ -39,7 +39,7 @@
             intmin  = 3283290,
             intspin =    4320,
             endJD   =      90,
-            iter    =     900,
+            iter    =    1200,
 /
 &INIT_WRITE_TRAJS
       twritetype =      2,
