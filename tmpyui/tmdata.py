@@ -67,8 +67,15 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     else:
         raise ValueError("Grid geometry not recognised.")
 
-    # tracmass has opposite Z order, Zu is the lower interface
-    Z = grid.Zp1[::-1].to_masked_array()
+    # We have to take into account the shaved bottom cells
+    # tracmass returns a "normalised" vertical coordinate
+    # which has to be translated into real space by taking
+    # into account hFacC
+    dZ = (grid.drF * grid.hFacC).to_masked_array()
+    Z = np.zeros((dZ.shape[0] + 1, dZ.shape[1], dZ.shape[2]))
+    Z[1:, ...] = np.cumsum(dZ, axis=0).filled(0)
+    # tracmass has opposite Z order
+    Z = Z[::-1, ...]
 
     tmbin = np.fromfile(tmtracks, '>f4')
     if (tmbin.size % 5) != 0:
@@ -119,6 +126,8 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
 
     for thisid in ids:
         thisind = np.where(tmbin[:, 0]==thisid)[0]
+        # NOTE: we can use these indices directly, because the grid in tracmass
+        # has been defined starting from zero, similarly to python's indexing.
         ii = tmbin[thisind, 2]
         ii_int = np.int32(ii)
         jj = tmbin[thisind, 3]
@@ -154,7 +163,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
                       np.atleast_2d(st)
 
         # z
-        st = pz * Z[kk_int] + nz * Z[kk_int+1]
+        st = pz * Z[kk_int, jj_int, ii_int] + nz * Z[kk_int+1, jj_int, ii_int]
         tracks["ztrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
                       np.atleast_2d(st)
 
