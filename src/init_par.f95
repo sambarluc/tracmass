@@ -49,7 +49,9 @@ SUBROUTINE init_params
 ! intspin : seeding time in steps (of output of GCM simulation)
 ! endJD   : number of days of the particle tracking simulation
 ! iter    : number of time steps between GCM output
-   namelist /INIT_TIME/             ngcm, dtgcm, intmin, intspin, endJD, iter
+! skipseed: seed every skipseed GCM outputs (if 1, seed all the time)
+   namelist /INIT_TIME/             ngcm, dtgcm, intmin, intspin, endJD, iter, &
+                                    skipseed
    namelist /INIT_WRITE_TRAJS/      twritetype, kriva, outDataDir, outDataFile, &
                                     outdircase, intminInOutFile, intpsi, outdirdate
           

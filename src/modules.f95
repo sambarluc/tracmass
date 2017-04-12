@@ -183,7 +183,7 @@ MODULE mod_time
 
   !Timestep increasing with one for each new velocity field
   INTEGER                                   :: ints      ,intstart ,intend
-  INTEGER                                   :: intrun    ,intspin
+  INTEGER                                   :: intrun    ,intspin, skipseed
   INTEGER                                   :: intmin    ,intmax
   INTEGER                                   :: nff=1
 

@@ -34,12 +34,14 @@
 ! intspin : seeding time in steps (of output of GCM simulation)
 ! endJD  : number of days of the particle tracking simulation
 ! iter   : number of time steps between GCM output
+! skipseed: seed every skipseed GCM outputs (if 1, seed all the time)
             ngcm    =     0.5,
             dtgcm   =      20,
             intmin  = 3283290,
             intspin =    4320,
             endJD   =      90,
             iter    =    1200,
+            skipseed=       3,
 /
 &INIT_WRITE_TRAJS
       twritetype =      2,
