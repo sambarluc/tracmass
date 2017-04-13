@@ -7,10 +7,10 @@
         gridname = 'Lac Léman low res',
       gridsource = 'A. Cimatoribus',
         griddesc = 'Curvilinear orthogonal, ~200m resolution, 35 vertical levels',
-       indatadir = '/media/space/Data/MITgcm/lac_leman/run_2016/',
+       indatadir = '$ddir',
 /
 &INIT_CASE_DESCRIPTION
-        caseNum  = '$cn',
+        caseNum  = $cn,
         casedesc = 'Release from Rhone area',
 /
 &INIT_GRID_SIZE
@@ -41,7 +41,7 @@
             intspin =    4320,
             endJD   =      90,
             iter    =    1200,
-            skipseed=       3,
+            skipseed=       2,
 /
 &INIT_WRITE_TRAJS
       twritetype =      2,
@@ -66,6 +66,8 @@
 !                 2 = Seed particles zonal from the north (x-z)
 !                 3 = Seed particles horiz from top (x-y)
 !                 4 = Seed particles in the middle of T-box
+!                 5 = Seed at given x-y-z point (note this can only be passed
+!                     via the seed file, here it has no effect)
             isec =      4,
 ! idir:           1 = follow positive direction (eastward/northward)  
 !                -1 = follow negative direction (westward/southward)
@@ -90,18 +92,18 @@
 ! seedtype:       1 = Seed an area defined by ist, jst, and kst.
 !                 2 = Use a list to define which cells to seed.
 !                 3 = Use a 2-D mask file.
-        seedtype =      1,
-            ist1 =    $i1,
-            ist2 =    $i2,
-            jst1 =    $j1,
-            jst2 =    $j2,
+        seedtype =      2,
+            ist1 =     -1,
+            ist2 =     -1,
+            jst1 =     -1,
+            jst2 =     -1,
 ! k goes from 1 (bottom) upwards
-            kst1 =    $k1,
-            kst2 =    $k2,
+            kst1 =     -1,
+            kst2 =     -1,
             tst1 =     -1,
             tst2 =     -1,
-         seeddir =     '',
-        seedfile =     '',
+         seeddir =     '/home/cimatori/Work/tracmass/projects/MITgcm_leman_mp/',
+        seedfile =     'seed.txt',
      varseedfile =      0,
 ! 1: seed between tst1 and tst2
 ! 2: seed in file-defined time definition
@@ -111,7 +113,7 @@
          seedall =      1,
 ! 1: seed at i,j,k positions
 ! 2: seed at x,y,z positions (?)
-         seedpos =      1,
+         seedpos =      2,
        seedparts =      0,
      seedpart_id =      0,
 /

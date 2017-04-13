@@ -19,53 +19,12 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     import numpy as np
     import xarray as xr
     from xmitgcm import open_mdsdataset as mitgcmds
+    from . import _get_geometry
 
     xmgcm["swap_dims"] = False
     grid = mitgcmds(mitdir, read_grid=True, iters=[], **xmgcm)
-
-    if "geometry" in xmgcm.keys():
-        if xmgcm["geometry"]=="curvilinear":
-            ni = grid.i_g.size + 1
-            nj = grid.j_g.size + 1
-            xG = np.zeros((nj, ni))
-            yG = np.zeros((nj, ni))
-            # copy to array, we need numpy fancy indexing
-            xG[:-1, :-1] = grid.XG.to_masked_array()
-            yG[:-1, :-1] = grid.YG.to_masked_array()
-            cs = grid.CS.to_masked_array()
-            sn = grid.SN.to_masked_array()
-            dxG = grid.dxG.to_masked_array()
-            dyG = grid.dyG.to_masked_array()
-
-            # Fill (approximate) end points of the grid
-            xG[:-1, -1] = xG[:-1, -2] + dxG[:, -1] * cs[:, -1]
-            xG[-1, :-1] = xG[-2, :-1] - dyG[-1, :] * sn[-1, :]
-            # we lack the last metric at the NE corner, so we use the
-            # nearby metric
-            xG[-1, -1] = xG[-1, -2] + dxG[-1, -1] * cs[-1, -1]
-
-            yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :] * cs[-1, :]
-            yG[:-1, -1] = yG[:-1, -2] + dxG[:, -1] * sn[:, -1]
-            yG[-1, -1] = yG[-2, -1] + dyG[-1, -1] * cs[-1, -1]
-        elif xmgcm["geometry"]=="cartesian":
-            ni = grid.i.size + 1
-            nj = grid.j.size + 1
-            xG = np.zeros((nj, ni))
-            yG = np.zeros((nj, ni))
-            # copy to array, we need numpy fancy indexing
-            xG[:-1, :-1] = grid.XG.to_masked_array()
-            yG[:-1, :-1] = grid.YG.to_masked_array()
-            dxG = grid.dxG.to_masked_array()
-            dyG = grid.dyG.to_masked_array()
-
-            # Fill (approximate) end points of the grid
-            xG[:-1, -1] = xG[:-1, -2] + dxG[:, -1]
-            xG[-1, :] = xG[-2, :]
-
-            yG[-1, :-1] = yG[-2, :-1] + dyG[-1, :]
-            yG[:, -1] = yG[:, -2]
-    else:
-        raise ValueError("Grid geometry not recognised.")
+    
+    xG, yG = _get_geometry(grid, xmgcm["geometry"])
 
     # We have to take into account the shaved bottom cells
     # tracmass returns a "normalised" vertical coordinate

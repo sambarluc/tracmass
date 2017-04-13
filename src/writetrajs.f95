@@ -29,7 +29,9 @@ CONTAINS
     if (outdircase .eqv. .true.) THEN
        outDataDir = trim(outDataDir) // trim(Project) // '/'
        outDataDir = trim(outDataDir) // 'results/' // trim(Case)
-       outDataDir = trim(outDataDir) // trim(caseNum) // '/'
+       yearstr = "xxxx"
+       write (yearstr(:),'(I4.4)') caseNum
+       outDataDir = trim(outDataDir) // trim(yearstr) // '/'
     END IF
     if (outdirdate .eqv. .true.) then
        yearstr = 'XXXXXXXXXX'
