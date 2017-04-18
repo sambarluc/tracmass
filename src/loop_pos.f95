@@ -233,7 +233,7 @@ contains
 
        call vertvel(ia,iam,ja,kk)
 #if defined explicit_w || full_wflux
-       uu=wflux(ia,ja,kk,nsm)
+       uu=intrpbg*wflux(ia, ja, kk,nsp)+intrpb*wflux(ia, ja, kk,nsm)
 #else
        uu=intrpbg*wflux(kk,nsp)+intrpb*wflux(kk,nsm)
 #endif
@@ -280,7 +280,7 @@ contains
        call vertvel(ia, iam, ja, kk)
      
 #if defined explicit_w || full_wflux
-       if(wflux(ia,ja,kk,nsm).lt.0.d0) kb=ka-1
+       if(intrpbg*wflux(ia, ja, kk,nsp)+intrpb*wflux(ia, ja, kk,nsm).lt.0.d0) kb=ka-1
 #else
        if(intrpbg*wflux(kk,nsp)+intrpb*wflux(kk,nsm).lt.0.d0) kb=ka-1
 #endif              
