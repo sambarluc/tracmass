@@ -38,9 +38,9 @@
             ngcm    =     0.5,
             dtgcm   =      20,
             intmin  = 3283290,
-            intspin =    4320,
-            endJD   =      90,
-            iter    =    1200,
+            intspin =   18480,
+            endJD   =     365,
+            iter    =    1000,
             skipseed=       2,
 /
 &INIT_WRITE_TRAJS

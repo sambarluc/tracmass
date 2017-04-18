@@ -5,48 +5,45 @@
 #------------------------------------------------------------------------
    fl01   = -Dtimestep       # Analytical time scheme used to solve the differential Eqs.
 #  fl01   = -Dtimeanalyt     # Time steps with analytical stationary scheme 
-   fl02   = -Dregulardt      # Regular time steps to be used with -Dtimestep
 #------------------------------------------------------------------------
-#  fl03   = -Dtempsalt       # Include temp and salt
-#  fl04   = -Dtextwrite      # Write results to textfile
-#  fl05   = -Dcsvwrite       # Write results to comma-separated file
-   fl06   = -Dbinwrite       # Write results to binaryfile
-#  fl07   = -Dmysqlwrite     # Write results to mysql
+#  fl02   = -Dtempsalt       # Include temp and salt
+#  fl03   = -Dtextwrite      # Write results to textfile
+#  fl04   = -Dcsvwrite       # Write results to comma-separated file
+   fl05   = -Dbinwrite       # Write results to binaryfile
+#  fl06   = -Dmysqlwrite     # Write results to mysql
 #------------------------------------------------------------------------
-#  fl08  = -Dstreamxy       # Calculates the barotropic stream function.
-#  fl09  = -Dstreamr        #    vertical stream function, z=density
-#  fl10  = -Dstreamts       #    vertical stream function, z=???
-#  fl11  = -Dstreamv        #    vertical stream function, z=depth
-#  fl12  = -Drerun          # Stores the Lagrangian stream functions as a
+#  fl07  = -Dstreamxy       # Calculates the barotropic stream function.
+#  fl08  = -Dstreamr        #    vertical stream function, z=density
+#  fl09  = -Dstreamts       #    vertical stream function, z=???
+#  fl10  = -Dstreamv        #    vertical stream function, z=depth
+#  fl11  = -Drerun          # Stores the Lagrangian stream functions as a
                             # function of the end positions that has been
                             # calculated in an identical previous run.    
-#  fl13  = -Dinitxyt        # Start trajectories at given positions and times
 #------------------------------------------------------------------------
-#  fl14  = -Dtwodim         # Turn off vertical velocities.
-   fl15  = -Dfull_wflux     # Use a full 3D wflux field.
-   fl16  = -Dexplicit_w     # Use a given vertical velocity.
+#  fl12  = -Dtwodim         # Turn off vertical velocities.
+   fl13  = -Dfull_wflux     # Use a full 3D wflux field.
+   fl14  = -Dexplicit_w     # Use a given vertical velocity.
 #------------------------------------------------------------------------
-#  fl17  = -Dvarbottombox   # Variable bottom box to match actual depth
-#  fl18  = -Dfreesurface    # Variable bottom box to match actual depth
-#  fl19  = -Dzvec1D         # Cell depths defined as vector (for z-coord?)
-   fl20  = -Dzgrid3D        # Cell depths defined as 3D grid (for sigma)
-#  fl21  = -Dzgrid3Dt       # Cell depths 3D and time interp. (for atm)
+#  fl15  = -Dvarbottombox   # Variable bottom box to match actual depth
+#  fl16  = -Dfreesurface    # Variable bottom box to match actual depth
+#  fl17  = -Dzvec1D         # Cell depths defined as vector (for z-coord?)
+   fl18  = -Dzgrid3D        # Cell depths defined as 3D grid (for sigma)
+#  fl19  = -Dzgrid3Dt       # Cell depths 3D and time interp. (for atm)
 #------------------------------------------------------------------------
-#  fl22  = -Dselect         # Select only one trajectory (for debugging)
-#  fl23  = -Dtracer         # Stores a simulated tracer
-#  fl24  = -Dsediment       # Sediment code developed for RCO
+#  fl20  = -Dtracer         # Stores a simulated tracer
+#  fl21  = -Dsediment       # Sediment code developed for RCO
 #------------------------------------------------------------------------
-#  fl25  = -Dturb           # Adds subgrid turbulent velocities 
-#  fl26  = -Ddiffusion      # Adds a diffusion on trajectory
-#  fl27  = -Danisodiffusion # Adds an anisotropic diffusion on trajectory
-#  fl28  = -Dcoarse         # Adds a diffusion on trajectory
+#  fl22  = -Dturb           # Adds subgrid turbulent velocities 
+#  fl23  = -Ddiffusion      # Adds a diffusion on trajectory
+#  fl24  = -Danisodiffusion # Adds an anisotropic diffusion on trajectory
 #------------------------------------------------------------------------
-   fl29  = -DMITgcm         # Changes in grid definition for MITgcm
+   fl25  = -DMITgcm         # Changes in grid definition for MITgcm
+   fl26  = -Dno_netcdf      # NETcdf not working with ifort
 #========================================================================
 
 ORM_FLAGS= -D$(PROJECT) \
 $(fl01)$(fl02)$(fl03)$(fl04)$(fl05)$(fl06)$(fl07)$(fl08)$(fl09)$(fl10)\
 $(fl11)$(fl12)$(fl13)$(fl14)$(fl15)$(fl16)$(fl17)$(fl18)$(fl19)$(fl20)\
-$(fl21)$(fl22)$(fl23)$(fl24)$(fl25)$(fl26)$(fl27)$(fl28)$(fl29)$(fl30)\
+$(fl21)$(fl22)$(fl23)$(fl24)$(fl25)$(fl26)\
 
 # Var bottom to be used by occ66 || orc || for || sim || multcol || jplSCB || eccoSOSE

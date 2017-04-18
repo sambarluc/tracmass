@@ -34,7 +34,8 @@ ifeq ($(NETCDFLIBS),"automatic-44")
 endif 
 ifeq ($(NETCDFLIBS),"ecol-WS")
 	INC_DIR = $(shell nf-config --cflags)
-	LNK_FLAGS = -L/usr/lib/x86_64-linux-gnu -lnetcdf -lnetcdff 
+#	LNK_FLAGS = -L/usr/lib/x86_64-linux-gnu -lnetcdf -lnetcdff 
+	LNK_FLAGS = -L/home/cimatori/installed/netcdf/lib -lnetcdf -lnetcdff
 endif 
 ifeq ($(NETCDFLIBS),"macports")
 	LIB_DIR          = -L/opt/local/lib
@@ -49,7 +50,7 @@ endif
 
 ifeq ($(F95COMPILER),"gfortran")
 #       FF_FLAGS         = -O0 -c -x f95-cpp-input -g -fbacktrace -fbounds-check -fconvert=big-endian #-fimplicit-none
-        FF_FLAGS         = -O2 -c -x f95-cpp-input -fbounds-check -fconvert=big-endian #-fimplicit-none
+        FF_FLAGS         = -O3 -c -x f95-cpp-input -fbounds-check -fconvert=big-endian #-fimplicit-none
         F90_FLAGS        = -fno-underscoring 
 	FF              += $(LIB_DIR) $(INC_DIR) $(F90_FLAGS) $(ORM_FLAGS) -pg -J$(OBJDIR)
 endif
@@ -60,8 +61,15 @@ ifeq ($(F95COMPILER),"g95")
 endif
 
 ifeq ($(F95COMPILER),"ifort")
-        FF_FLAGS         = -O3 -c -cpp -convert big_endian
-        F90_FLAGS        = -free -assume nounderscore
+# debug, no optimization
+#       FF_FLAGS         = -O0 -g -fp-model strict -c -cpp -convert big_endian
+# optimized
+        FF_FLAGS         = -O3 -ipo -xHOST -fp-model strict -c -cpp -convert big_endian
+# collect profiling info
+#       FF_FLAGS         = -O2 -xHOST -fp-model strict -c -cpp -convert big_endian -prof-gen -prof-dir /home/cimatori/git/tracmass/profiling
+# use profiling info
+#       FF_FLAGS         = -O3 -ipo -xHOST -fp-model strict -c -cpp -convert big_endian -prof-use -prof-dir /home/cimatori/git/tracmass/profiling
+        F90_FLAGS        = -free -assume nounderscore -assume buffered_io -assume buffered_stdout
 	ARG_FLAGS       += -Tf
         FF              += $(LIB_DIR) $(INC_DIR) $(F90_FLAGS) $(ORM_FLAGS)
 endif
@@ -79,7 +87,7 @@ VPATH = src:projects/$(PROJECT):src/active_particles
 
 all: runfile
 
-objects := $(addprefix $(OBJDIR)/,modules.o module_getdata.o savepsi.o \
+objects := $(addprefix $(OBJDIR)/,modules.o savepsi.o \
                     loop_pos.o writetrajs.o seed.o init_seed.o sw_stat.o \
                     $(ACTVEL) getfile.o vertvel.o coord.o cross.o init_par.o \
                     time_subs.o interp.o interp2.o pos.o sw_seck.o \
@@ -103,5 +111,6 @@ $(OBJDIR):
 .PHONY : clean
 clean :
 	-rm -rf build
+	-rm *.mod
 	-rm $(RUNFILE)
 
