@@ -240,19 +240,12 @@ CONTAINS
     USE mod_param, only: iter
     IMPLICIT NONE
 
-#ifdef regulardt
-    if(ds == dsmin) then ! transform ds to dt in seconds
-       !            dt=dt  ! this makes dt more accurate
-    else
-       dt = ds * dxyz 
-    endif
-#else
     if(ds == dsmin) then ! transform ds to dt in seconds
        dt=dtmin  ! this makes dt more accurate
     else
        dt = ds * dxyz 
     endif
-#endif /*regulardt*/
+
     if(dt.lt.0.d0) then
        Print *,"Error! dt is less than zero."
        print *,'dt=',dt,"ds=",ds,"dxyz=",dxyz,"dsmin=",dsmin
@@ -269,19 +262,7 @@ CONTAINS
        dsc=ds
     else
        tt=tt+dt
-#if defined regulardt
-       if(dt == dtmin) then
-          ts=ts+dstep
-          tss=tss+1.d0
-       elseif(dt == dtreg) then  
-          ts=nint((ts+dtreg/tseas)*dble(iter), 8)/dble(iter)
-          !                 ts=ts+dtreg/tseas
-          tss=dble(nint(tss+dt/dtmin))
-       else
-          ts=ts+dt/tseas
-          tss=tss+dt/dtmin
-       endif
-#else
+
        if(dt == dtmin) then
           ts=ts+dstep
           tss=tss+1.d0
@@ -290,7 +271,7 @@ CONTAINS
           tss=tss+dt/tseas*dble(iter)
           !                 tss=tss+dt/dtmin
        endif
-#endif /*regulardt*/
+
     end if
     ! === time interpolation constant ===
     intrpbg=dmod(ts,1.d0) 

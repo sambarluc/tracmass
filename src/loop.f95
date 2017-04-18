@@ -295,14 +295,9 @@ SUBROUTINE loop
            ! space variables (x,...) are dimensionless    !
            ! time variables (ds,...) are in seconds/m^3   !
            !==============================================! 
-#ifdef regulardt
-           dtreg=dtmin * ( dble(int(tt/tseas*dble(iter),8)) +  & 
-                1.d0 - tt/tseas*dble(iter) )
-           dt=dtreg
-           dsmin=dt/dxyz
-#else
+
            dsmin=dtmin/dxyz
-#endif /*regulardt*/ 
+
            call active_niter 
            !call turbuflux(ia,ja,ka,dt)
            ! === calculate the vertical velocity ===
