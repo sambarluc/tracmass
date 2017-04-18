@@ -90,6 +90,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
                                              dims=["id", "time"])
 
     for thisid in ids:
+        print("Process id: %d (total: %d)" % (thisid, ids.size))
         thisind = np.where(tmbin[:, 0]==thisid)[0]
         # NOTE: we can use these indices directly, because the grid in tracmass
         # has been defined starting from zero, similarly to python's indexing.
