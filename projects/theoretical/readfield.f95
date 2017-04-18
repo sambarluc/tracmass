@@ -18,8 +18,6 @@ subroutine readfields
   call datasetswap
   call updateClock
 
-  ntime=1000000*currYear + 10000*currMon + 100*currDay + currHour
-
 
   !____ construct format of time to read files _______________________
   !omtime = 2.d0 *pi * dble(ints)/dble(2)

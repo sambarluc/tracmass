@@ -10,7 +10,7 @@
        indatadir =   './',
 /
 &INIT_CASE_DESCRIPTION
-        casename = 'Academic',
+        casenum  = 1,
         casedesc = 'Rectangular ocean',
 /
 &INIT_GRID_SIZE
@@ -26,35 +26,22 @@
      subgridfile =     '',
        subgridid =      1,
 /
-&INIT_BASE_TIME
-         basesec =      0,
-         basemin =      0,
-        basehour =      0,
-         baseday =      1,
-         basemon =      1,
-        baseyear =   1988,
-/
-&INIT_GRID_TIME
-   fieldsperfile =      1,
-            ngcm =      1,
-            iter =     10,
-          intmax = 146000,
-        minveljd =     -1,
-        maxveljd =     -1,
-/
-&INIT_START_DATE
-        startsec =      0,
-        startmin =      0,
-       starthour =      0,
-        startday =      1,
-        startmon =      1,
-       startyear =   1988,
-         startjd =     -1,
-          intmin =      1,
-/
-&INIT_RUN_TIME
-         intspin =      1,
-          intrun =    100,
+&INIT_TIME
+! Define the time parameters:
+! ngcm   : number of hours between GCM output
+! dtgcm  : time step in seconds of the GCM simulation
+! intmin : initial time step number of GCM, the simulation will start from this
+! intspin : seeding time in steps (of output of GCM simulation)
+! endJD  : number of days of the particle tracking simulation
+! iter   : number of time steps between GCM output
+! skipseed: seed every skipseed GCM outputs (if 1, seed all the time)
+            ngcm    =     0.5,
+            dtgcm   =      20,
+            intmin  = 3283290,
+            intspin =   18480,
+            endJD   =       5,
+            iter    =    1000,
+            skipseed=       2,
 /
 &INIT_WRITE_TRAJS
       twritetype =      2,
