@@ -34,7 +34,6 @@ PROGRAM TRACMASS
 
   call print_header_main
   call init_params
-  call coordinat
   call writesetup_main
   
   if(nff == 1) then ! forward 
