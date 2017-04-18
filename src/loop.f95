@@ -142,25 +142,21 @@ SUBROUTINE loop
   !=== read ocean/atmosphere GCM data files               ===
   !==========================================================
   
-  call fancyTimer('initialize dataset','start')
   ff=dble(nff)
   ints = intstart
   call updateclock  
   call readfields   ! initial dataset
   call active_init
   ntrac = 0
-  call fancyTimer('initialize dataset','stop')
 
   !==========================================================
   !=== Start main time loop                               ===
   !==========================================================
   intsTimeLoop: do ints=intstart+nff, intstart+intrun, nff
-     call fancyTimer('reading next datafield','start')
      tt = (ints-intstart)*tseas
      if (degrade_counter < 1) call readfields
      degrade_counter = degrade_counter + 1
      if (degrade_counter > degrade_time) degrade_counter = 0
-     call fancyTimer('reading next datafield','stop')
      
      !=======================================================
      !=== write stream functions and "particle tracer"    ===
@@ -171,9 +167,7 @@ SUBROUTINE loop
      endif
 
      intspinCond: if(ints*nff <= (intstart+intspin)*nff) then
-        call fancyTimer('seeding','start')
         call seed (tt,ts)
-        call fancyTimer('seeding','stop')
         t0 = tt
         dt = 0.d0
      end if intspinCond
@@ -187,7 +181,6 @@ SUBROUTINE loop
      !=== a new position for this time step.              ===
      !=======================================================
      
-     call fancyTimer('advection','start')
      
      ntracLoop: do ntrac=1,ntractot
         !print *,ntrac, ntractot
@@ -851,22 +844,5 @@ return
     print '(A,F7.2,A,F7.2)','      z1 : ', z1, '      z0 : ', z0
   end subroutine print_pos
 
-  subroutine fancyTimer(timerText ,testStr)
-    IMPLICIT NONE
-
-    CHARACTER (len=*)                          :: timerText ,testStr
-    REAL ,SAVE                                 :: fullstamp1 ,fullstamp2
-    REAL ,SAVE ,DIMENSION(2)                   :: timestamp1 ,timestamp2
-    REAL                                       :: timeDiff
-!!$    select case (trim(testStr))
-!!$    case ('start')
-!!$       WRITE (6, FMT="(A)", ADVANCE="NO") ,' - Begin '//trim(timerText)
-!!$       call etime(timestamp1,fullstamp1)
-!!$    case ('stop')
-!!$       call etime(timestamp2,fullstamp2)
-!!$       timeDiff=fullstamp2-fullstamp1
-!!$       write (6 , FMT="(A,F6.1,A)") ', done in ' ,timeDiff ,' sec'
-!!$    end select
-  end subroutine fancyTimer
 end subroutine loop
 
