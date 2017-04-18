@@ -109,11 +109,6 @@ CONTAINS
          vol = 0    
          ib  = iist
          ibm = ib-1
-#ifndef MITgcm
-         IF (ibm == 0) THEN
-            ibm = IMT
-         END IF
-#endif
          jb  = ijst
          kb  = ikst
          
@@ -250,11 +245,9 @@ CONTAINS
 
                   END SELECT
 !CA It could still happen that z1 is below the bottom with MITgcm shaved cells
-#ifdef MITgcm
                IF (z1.LE.(KM-kmtb(ib,jb))) THEN
                   CYCLE kkkLoop
                END IF
-#endif
                   ! ------------------------------------------------------
                   ! --- Check properties of water mass at initial time ---
                   ! ------------------------------------------------------ 

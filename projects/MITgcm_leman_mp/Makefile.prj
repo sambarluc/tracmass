@@ -37,8 +37,7 @@
 #  fl23  = -Ddiffusion      # Adds a diffusion on trajectory
 #  fl24  = -Danisodiffusion # Adds an anisotropic diffusion on trajectory
 #------------------------------------------------------------------------
-   fl25  = -DMITgcm         # Changes in grid definition for MITgcm
-   fl26  = -Dno_netcdf      # NETcdf not working with ifort
+   fl25  = -Dno_netcdf      # NETcdf not working with ifort
 #========================================================================
 
 ORM_FLAGS= -D$(PROJECT) \

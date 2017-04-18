@@ -60,9 +60,8 @@ CONTAINS
     print *, thinline !--------------------------------------------------- 
     print *,"Selected compile options:"
 
-#if defined MITgcm
-    print *,' - MITgcm configuration of grids'
-#endif
+    print *,'!!! This code is meant to work with MITgcm grids !!!'
+    print *,'   !!! It may or may not work on other grids !!!'
 
 #if defined zgrid3Dt
     print *,' - zgrid3Dt has been renamed to zgrid3D. Please update your'

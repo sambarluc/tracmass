@@ -40,9 +40,6 @@ subroutine pos_orgn(ijk,ia,ja,ka,r0,r1,ds)
   if(ijk.eq.1) then
      ii=ia
      im=ia-1
-#ifndef MITgcm
-     if(im.eq.0) im=IMT
-#endif
      uu=(intrpg*uflux(ia,ja,ka,nsp)+intrpr*uflux(ia,ja,ka,nsm))*ff
      um=(intrpg*uflux(im,ja,ka,nsp)+intrpr*uflux(im,ja,ka,nsm))*ff
 #ifdef turb    
