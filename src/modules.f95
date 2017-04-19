@@ -464,9 +464,9 @@ MODULE mod_ncwrite
 
   SUBROUTINE create_ncfile(fname, file_id, NCtime)
     USE mod_param, ONLY: ntracmax
-    CHARACTER(LEN=200), INTENT( IN) :: fname
-    INTEGER, INTENT( OUT)           :: file_id
-    INTEGER                         :: ids(ntracmax), ii
+    CHARACTER(LEN=*)                     :: fname
+    INTEGER, INTENT( OUT)                :: file_id
+    INTEGER                              :: ids(ntracmax), ii
     REAL*8, DIMENSION(:), ALLOCATABLE    :: NCtime
 
     DO ii = 1,ntracmax
