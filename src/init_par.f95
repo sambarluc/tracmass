@@ -56,7 +56,7 @@ SUBROUTINE init_params
                                     outdircase, intminInOutFile, intpsi, outdirdate
           
    namelist /INIT_SEEDING/          nff, isec, idir, nqua, partQuant,        &
-                                    ntracmax, loneparticle, SeedType, ist1,  &
+                                    loneparticle, SeedType, ist1,  &
                                     ist2, jst1, jst2, kst1, kst2, tst1, tst2,&
                                     seedDir, seedFile, varSeedFile, seedTime,&
                                     seedAll, seedPos, seedparts, seedpart_id,&
@@ -279,6 +279,8 @@ SUBROUTINE init_params
       ALLOCATE ( uvel(imt,jmt,km) ,vvel(imt,jmt,km) ,wvel(imt,jmt,km) )
       
       ! === Init mod_traj ===
+      ntracmax = INT(FLOOR(MIN(DBLE(intspin), 24.0*endJD/ngcm) / skipseed))
+      print*, "ntracmax: ", ntracmax
       ALLOCATE ( trj(NTRJ,ntracmax), nrj(NNRJ,ntracmax) )
       ALLOCATE ( nexit(NEND) ) 
       nrj = 0

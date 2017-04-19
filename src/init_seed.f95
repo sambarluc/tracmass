@@ -84,6 +84,7 @@ SUBROUTINE init_seed()
       chFile: IF (fileexists) THEN
          
          nsdMax=0
+         landsd = 0
          OPEN(unit=34,file=fullSeedFile, ACCESS = 'SEQUENTIAL', &
               FORM = 'FORMATTED', ACTION = 'READ')
          

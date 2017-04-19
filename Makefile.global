@@ -33,9 +33,10 @@ ifeq ($(NETCDFLIBS),"automatic-44")
 	LIB_DIR = $(shell nf-config --flibs)
 endif 
 ifeq ($(NETCDFLIBS),"ecol-WS")
-	INC_DIR = $(shell nf-config --cflags)
+	INC_DIR   = $(shell nf-config --cflags)
 #	LNK_FLAGS = -L/usr/lib/x86_64-linux-gnu -lnetcdf -lnetcdff 
-	LNK_FLAGS = -L/home/cimatori/installed/netcdf/lib -lnetcdf -lnetcdff
+	LIB_DIR   = -L/home/cimatori/installed/netcdf/lib
+        LNK_FLAGS = -lnetcdf -lnetcdff
 endif 
 ifeq ($(NETCDFLIBS),"macports")
 	LIB_DIR          = -L/opt/local/lib
@@ -62,14 +63,14 @@ endif
 
 ifeq ($(F95COMPILER),"ifort")
 # debug, no optimization
-#       FF_FLAGS         = -O0 -g -fp-model strict -c -cpp -convert big_endian
+#       FF_FLAGS         = -O0 -g -traceback -fp-model strict -c -cpp -convert big_endian
 # optimized
         FF_FLAGS         = -O3 -ipo -xHOST -fp-model strict -c -cpp -convert big_endian
 # collect profiling info
 #       FF_FLAGS         = -O2 -xHOST -fp-model strict -c -cpp -convert big_endian -prof-gen -prof-dir /home/cimatori/git/tracmass/profiling
 # use profiling info
 #       FF_FLAGS         = -O3 -ipo -xHOST -fp-model strict -c -cpp -convert big_endian -prof-use -prof-dir /home/cimatori/git/tracmass/profiling
-        F90_FLAGS        = -free -assume nounderscore -assume buffered_io -assume buffered_stdout
+        F90_FLAGS        = -free -assume buffered_io
 	ARG_FLAGS       += -Tf
         FF              += $(LIB_DIR) $(INC_DIR) $(F90_FLAGS) $(ORM_FLAGS)
 endif

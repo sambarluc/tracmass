@@ -38,7 +38,7 @@
             ngcm    =     0.5,
             dtgcm   =      20,
             intmin  = 3283290,
-            intspin =   18480,
+            intspin =   13200,
             endJD   =     365,
             iter    =    1000,
             skipseed=       2,
@@ -85,7 +85,6 @@
             nqua =      3,
 ! === Particles seeded (particles/cell or m3s-1/particle or m3/particle)
        partquant =    1e5,
-        ntracmax = 1000000,
     loneparticle =     -1,
 ! === initial directions all in MODEL COORDINATES ===
 ! Method for seeding particles.

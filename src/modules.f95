@@ -434,3 +434,137 @@ MODULE mod_orbital
 #endif
 ENDMODULE mod_orbital
 ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
+
+#ifdef ncwrite
+MODULE mod_ncwrite
+
+  USE netcdf
+  IMPLICIT NONE
+
+  INTEGER                            :: ncid_out, ncid_run, ncid_kll
+  INTEGER                            :: ncid_ini, ncid_err, id_dim
+  INTEGER                            :: time_dim, id_var, time_var
+  INTEGER                            :: x_var, y_var, z_var
+  ! Arrays containg a "mirror" of the time axis in each file
+  ! They enable to now at which position we have to write (in time)
+  ! without having to read from disk
+  REAL*8, DIMENSION(:), ALLOCATABLE  :: NCtime_out, NCtime_run, NCtime_kll
+  REAL*8, DIMENSION(:), ALLOCATABLE  :: NCtime_ini, NCtime_err, NCtimeold
+
+  CONTAINS
+
+  SUBROUTINE check(status)
+    INTEGER, INTENT ( IN) :: status
+    
+    IF(status /= nf90_noerr) THEN 
+      PRINT *, trim(nf90_strerror(status))
+      STOP "Stopped"
+    END IF
+  END SUBROUTINE check  
+
+  SUBROUTINE create_ncfile(fname, file_id, NCtime)
+    USE mod_param, ONLY: ntracmax
+    CHARACTER(LEN=200), INTENT( IN) :: fname
+    INTEGER, INTENT( OUT)           :: file_id
+    INTEGER                         :: ids(ntracmax), ii
+    REAL*8, DIMENSION(:), ALLOCATABLE    :: NCtime
+
+    DO ii = 1,ntracmax
+        ids(ii) = ii
+    END DO
+
+    ! We initialise the time array
+    ALLOCATE(NCtime(1))
+    NCtime(:) = 0.0
+
+    ! Open file
+    CALL check( nf90_create(fname, NF90_HDF5, file_id) )
+    ! Define Id dimension
+    CALL check( nf90_def_dim(file_id, "id", ntracmax, id_dim) )
+    CALL check( nf90_def_var(file_id, "id", NF90_INT, id_dim, id_var) )
+    CALL check( nf90_put_att(file_id, id_var, "long_name", "particle_ID") )
+    ! Define time dimension
+    CALL check( nf90_def_dim(file_id, "time", NF90_UNLIMITED, time_dim) )
+    CALL check( nf90_def_var(file_id, "time", NF90_REAL, time_dim, time_var) )
+    CALL check( nf90_put_att(file_id, time_var, "units", "seconds") )
+    ! Define position variables
+    CALL check( nf90_def_var(file_id, "itrack", NF90_FLOAT, &
+               (/id_dim, time_dim/), x_var) )
+    CALL check( nf90_def_var_fill(file_id, x_var, 0, -9.0E30) )
+    CALL check( nf90_put_att(file_id, x_var, "units", "fractional_cell_index") )
+    CALL check( nf90_def_var_chunking(file_id, x_var, NF90_CHUNKED, &
+                                      (/ntracmax, 100/)) )
+    CALL check( nf90_def_var_deflate(file_id, x_var, 1, 1, 1) )
+
+    CALL check( nf90_def_var(file_id, "jtrack", NF90_FLOAT, &
+               (/id_dim, time_dim/), y_var) )
+    CALL check( nf90_def_var_fill(file_id, y_var, 0, -9.0E30))
+    CALL check( nf90_put_att(file_id, y_var, "units", "fractional_cell_index") )
+    CALL check( nf90_def_var_chunking(file_id, y_var, NF90_CHUNKED, &
+                                      (/ntracmax, 100/)) )
+    CALL check( nf90_def_var_deflate(file_id, y_var, 1, 1, 1) )
+
+    CALL check( nf90_def_var(file_id, "ktrack", NF90_FLOAT, &
+               (/id_dim, time_dim/), z_var) )
+    CALL check( nf90_def_var_fill(file_id, z_var, 0, -9.0E30) )
+    CALL check( nf90_put_att(file_id, z_var, "units", "fractional_cell_index") )
+    CALL check( nf90_def_var_chunking(file_id, z_var, NF90_CHUNKED, &
+                                      (/ntracmax, 100/)) )
+    CALL check( nf90_def_var_deflate(file_id, z_var, 1, 1, 1) )
+    ! Finish definitions
+    CALL check( nf90_enddef(file_id) )
+    ! Write ids
+    CALL check( nf90_put_var(file_id, id_var, ids) )
+    CALL check( nf90_sync(file_id) )
+    ! Write zero time
+    CALL check( nf90_put_var(file_id, time_var, 0.0, (/1/)) )
+
+  END SUBROUTINE
+
+  SUBROUTINE write_ncpos(file_id, ntrac, x, y, z, time, NCtime)
+    INTEGER, INTENT( IN)                 :: file_id, ntrac
+    REAL*8, INTENT( IN)                  :: x, y, z, time
+    REAL*8, DIMENSION(:), ALLOCATABLE    :: NCtime
+    INTEGER                              :: start(2), loc
+
+    loc = loc_time(file_id, time, NCtime)
+
+    start = (/ntrac, loc/)
+
+    CALL check( nf90_put_var(file_id, x_var, x, start) )
+    CALL check( nf90_put_var(file_id, y_var, y, start) )
+    CALL check( nf90_put_var(file_id, z_var, z, start) )
+
+  END SUBROUTINE write_ncpos
+
+  FUNCTION loc_time(file_id, time, NCtime)
+    INTEGER                              :: loc_time, ii, file_id
+    REAL*8, INTENT( IN)                  :: time
+    REAL*8, DIMENSION(:), ALLOCATABLE    :: NCtime
+
+    loc_time = -9999999
+    ! We go backwards since the time we are looking for is usually towards the end
+    DO ii = SIZE(NCtime), 1, -1
+        IF (ABS(NCtime(ii) - time) .LE. 1e-9) THEN
+            loc_time = ii
+            EXIT
+        ENDIF
+    END DO
+    ! We did not find the time we are looking for, so we add it to the time axis
+    ! both in memory and on disk
+    IF (loc_time .EQ. -9999999) THEN
+        ALLOCATE(NCtimeold(SIZE(NCtime)))
+        NCtimeold(:) = NCtime(:)
+        DEALLOCATE(NCtime)
+        ALLOCATE(NCtime(SIZE(NCtimeold) + 1))
+        loc_time = SIZE(NCtime)
+        NCtime(1:loc_time-1) = NCtimeold(:)
+        NCtime(loc_time) = time
+        DEALLOCATE(NCtimeold)
+        CALL check( nf90_put_var(file_id, time_var, time, (/loc_time/)) )
+    END IF
+
+  END FUNCTION loc_time
+
+END MODULE mod_ncwrite
+#endif /* ncwrite */

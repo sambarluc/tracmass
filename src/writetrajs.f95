@@ -1,10 +1,11 @@
 
 module mod_write
 
-  USE mod_time, only: intstart,ints
   USE mod_name, only: case, caseNum, Project
   USE mod_time 
- ! USE mod_traj, only: ib,jb,kb
+#ifdef ncwrite
+  USE mod_ncwrite
+#endif
 
   IMPLICIT NONE
   INTEGER                                    :: intminInOutFile
@@ -81,6 +82,14 @@ CONTAINS
          access='direct' ,form='unformatted' ,recl=20 ,status='replace')
 #endif
 
+#if defined ncwrite
+    CALL create_ncfile( trim(fullWritePref)//'_out.nc', ncid_out, NCtime_out)
+    CALL create_ncfile( trim(fullWritePref)//'_run.nc', ncid_run, NCtime_run)
+    CALL create_ncfile( trim(fullWritePref)//'_kll.nc', ncid_kll, NCtime_kll)
+    CALL create_ncfile( trim(fullWritePref)//'_ini.nc', ncid_ini, NCtime_ini)
+    CALL create_ncfile( trim(fullWritePref)//'_err.nc', ncid_err, NCtime_err)
+#endif
+
 #if defined csvwrite
     open(unit=85, file=trim(fullWritePref)//'_out.csv', status='replace')
     open(unit=86, file=trim(fullWritePref)//'_run.csv', status='replace')
@@ -113,6 +122,7 @@ CONTAINS
   end subroutine open_outfiles
 
   subroutine close_outfiles
+
 #if defined textwrite
     close(56)
     close(57)
@@ -125,6 +135,13 @@ CONTAINS
     close(77)
     close(78)
     close(79)
+#endif
+#if defined ncwrite
+    CALL check( nf90_close(ncid_out) )
+    CALL check( nf90_close(ncid_run) )
+    CALL check( nf90_close(ncid_kll) )
+    CALL check( nf90_close(ncid_ini) )
+    CALL check( nf90_close(ncid_err) )
 #endif
 #if defined csvwrite
     close(75)
@@ -154,29 +171,9 @@ CONTAINS
     ! === Variables to interpolate fields ===
     REAL                                       :: temp, salt, dens
     REAL                                       :: temp2, salt2, dens2
-#if defined for || sim 
-566 format(i8,i7,f7.2,f7.2,f7.1,f10.2,f10.2 &
-         ,f10.1,f6.2,f6.2,f6.2,f6.0,8e8.1 )
-#elif defined rco || baltix 
-566 format(i8,i7,f7.2,f7.2,f7.1,2f12.4 &
-         ,f10.0,f6.2,f6.2,f6.2,f6.0,8e8.1 )
-#elif defined tes 
-566 format(i8,i7,f8.3,f8.3,f7.3,2f10.2 &
-         ,f10.0,f6.2,f6.2,f6.2,f6.0,8e8.1 )
-#elif defined ifs 
-566 format(i8,i7,f7.2,f7.2,f7.2,f10.2,f10.2 &
-         ,f15.0,f8.2,f8.2,f8.2,f6.0,8e8.1 )
-#elif defined orc
-    !566 format(i8,i7,2f8.2,f6.2,2f10.2 &
-    !         ,f12.0,f6.1,f6.2,f6.2,f6.0,8e8.1 )
-566 format(i8,i7,2f9.3,f6.2,2f10.2 &
+
+566 format(2i8,3f10.4,2f12.4 &
          ,f12.0,f6.1,f6.2,f6.2,f6.0,8e8.1 )
-#else
-566 format(i8,i7,3f10.4,2f12.4 &
-         ,f12.0,f6.1,f6.2,f6.2,f6.0,8e8.1 )
-    !566 format(i7,i7,f7.2,f7.2,f7.1,f10.4,f10.4 &
-    !         ,f13.4,f6.2,f6.2,f6.2,f6.0,8e8.1 )
-#endif
     
     xf   = floor(x1)
     yf   = floor(y1)
@@ -194,13 +191,10 @@ t0     =  trj(7,ntrac)
     call interp2(ib,jb,kb,temp,salt,dens)
 #endif
 
-!print *,x1,y1,z1
-    
 #if defined textwrite 
     select case (sel)
     case (10)
        write(58,566) ntrac,niter,x1,y1,z1,tt/tday,t0/tday,subvol,temp,salt,dens
-!       if(temp==0.) stop 4867
     case (11)
        if(  (kriva == 1 .AND. nrj(4,ntrac) == niter-1   ) .or. &
             (kriva == 2 .AND. scrivi                    ) .or. &
@@ -209,10 +203,6 @@ t0     =  trj(7,ntrac)
             (kriva == 5 .AND.                                  &
           &  MOD((REAL(tt)-REAL(t0))*REAL(NGCM)/REAL(ITER), 3600.) == 0.d0 ) .or. &
             (kriva == 6 .AND. .not.scrivi                  ) ) then
-!#if defined tempsalt
-!           !call interp(ib,jb,kb,x1,y1,z1,temp,salt,dens,1) 
-!           call interp2(ib,jb,kb,temp,salt,dens)
-!#endif
 #if defined biol
           write(56,566) ntrac,ints,x1,y1,z1,tt/3600.,t0/3600.
 #else
@@ -290,9 +280,6 @@ t0     =  trj(7,ntrac)
     case (13)
        recPosKll = recPosKll + 1
        write(unit=77 ,rec=recPosKll) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
-    case (15)
-       recPosRun = recPosRun + 1
-       write(unit=76 ,rec=recPosRun) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
     case (17) !out
        recPosOut = recPosOut + 1
        write(unit=77 ,rec=recPosOut) real(ntrac,kind=4),real(twrite,kind=4),x14,y14,z14
@@ -313,7 +300,34 @@ t0     =  trj(7,ntrac)
           print *, "Switched run file" 
        end if
     end select
-#endif    
+!CA we write either in binary or netcdf, not both
+#else ifdef ncwrite 
+    SELECT CASE (sel)       
+    CASE (10)
+       CALL write_ncpos(ncid_ini, ntrac, x1, y1, z1, tt, NCtime_ini)
+       return
+    CASE (11)
+       if(  (kriva == 1 .and. nrj(4,ntrac)  ==  niter-1 ) .or. &
+            (kriva == 2 .and. scrivi                    ) .or. &
+            (kriva == 3                                 ) .or. &
+            (kriva == 4 .and. niter == 1                ) .or. &
+            (kriva == 5 .and. abs(dmod(tt-t0,9.d0)) < 1e-5 ) .or. &
+            (kriva == 6 .and. .not.scrivi                  ) ) then
+#if defined tempsalt
+          STOP "UNIMPLEMENTED"
+#endif
+          CALL write_ncpos(ncid_run, ntrac, x1, y1, z1, tt, NCtime_run)
+       end if
+    CASE (13)
+       CALL write_ncpos(ncid_kll, ntrac, x1, y1, z1, tt, NCtime_kll)
+    CASE (17) !out
+       CALL write_ncpos(ncid_kll, ntrac, x1, y1, z1, tt, NCtime_kll)
+    CASE (19) !end
+       CALL write_ncpos(ncid_out, ntrac, x1, y1, z1, tt, NCtime_out)
+    CASE (40) !error
+       CALL write_ncpos(ncid_err, ntrac, x1, y1, z1, tt, NCtime_err)
+    END SELECT
+#endif /* ncwrite */
 
 #if defined csvwrite 
     x14=real(x1,kind=4)
@@ -356,5 +370,6 @@ t0     =  trj(7,ntrac)
     end select
 #endif   
   end subroutine writedata
+
 
 end module mod_write
