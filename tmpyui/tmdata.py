@@ -60,22 +60,21 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
     tracks.coords["XG_p1"] = (("j_p1", "i_p1"), xG)
     tracks.coords["YG_p1"] = (("j_p1", "i_p1"), yG)
 
-    tracks["xtrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                         coords={"id": ids,
-                                                 "time": tcoord},
-                                         dims=["id", "time"])
-    tracks["ytrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                         coords={"id": ids,
-                                                 "time": tcoord},
-                                         dims=["id", "time"])
-    tracks["ztrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                         coords={"id": ids,
-                                                 "time": tcoord},
-                                         dims=["id", "time"])
+    tracks["xtrack"] = xr.DataArray(np.empty((tcoord.size, ntracks))*np.nan,
+                                         coords={"time": tcoord,
+                                                 "id": ids},
+                                         dims=["time", "id"])
+    tracks["ytrack"] = xr.DataArray(np.empty((tcoord.size, ntracks))*np.nan,
+                                         coords={"time": tcoord,
+                                                 "id": ids},
+                                         dims=["time", "id"])
+    tracks["ztrack"] = xr.DataArray(np.empty((tcoord.size, ntracks))*np.nan,
+                                         coords={"time": tcoord,
+                                                 "id": ids},
+                                         dims=["time", "id"])
 
-    progress = "Process id: %d " + ("(total: %d)" % ids.size)
+    print("Convert particle trajectories...")
     for thisid in ids:
-        print(progress % thisid)
         trid = tracks.sel(id=thisid, drop=True)
         # NOTE: we can use these indices directly, because the grid in tracmass
         # has been defined starting from zero, similarly to python's indexing.
@@ -102,17 +101,18 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
         st = pxpy * xG[jj_int, ii_int] + pxny * xG[jj_int+1, ii_int] + \
              nxpy * xG[jj_int, ii_int+1] + nxny * xG[jj_int+1, ii_int+1]
         tracks["xtrack"].loc[{"id": [thisid], "time": tcoord}] = \
-                      np.atleast_2d(st)
+                      np.atleast_2d(st).T
 
         # y
         st = pxpy * yG[jj_int, ii_int] + pxny * yG[jj_int+1, ii_int] + \
              nxpy * yG[jj_int, ii_int+1] + nxny * yG[jj_int+1, ii_int+1]
         tracks["ytrack"].loc[{"id": [thisid], "time": tcoord}] = \
-                      np.atleast_2d(st)
+                      np.atleast_2d(st).T
 
         # z
         st = pz * Z[kk_int, jj_int, ii_int] + nz * Z[kk_int+1, jj_int, ii_int]
         tracks["ztrack"].loc[{"id": [thisid], "time": tcoord}] = \
-                      np.atleast_2d(st)
+                      np.atleast_2d(st).T
+    print("Done.")
 
     return tracks.where(tracks.itrack != 0)
