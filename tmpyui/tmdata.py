@@ -1,14 +1,13 @@
 from __future__ import division, print_function
 
 
-def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
+def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
     """
     mitdir:    Path to the MITgcm simulations results, used to load the grid information.
     tmdir:     File containing the Lagrangian tracks computed by tracmass.
     tstart:    Beginning time of the MITgcm simulation, as a string with
                format "2010-01-24 12:20"
     ids:       Particle id numbers to load. If None (default), all particles are loaded
-    inds:      Return tracks as indices too, default: False.
     **xmgcm:   Keywords arguments passed to xmgcm.mitgcmds to load MITgcm grid files.
 
     Returns:
@@ -36,27 +35,25 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
     # tracmass has opposite Z order
     Z = Z[::-1, ...]
 
-    tmbin = np.fromfile(tmtracks, '>f4')
-    if (tmbin.size % 5) != 0:
-        print("Something is wrong in the size of the tracmass file.")
-        tmbin = tmbin[:(tmbin.size//5)*5]
-    tmbin = np.reshape(tmbin, (tmbin.size//5, 5))
-    all_ids = np.unique(np.int32(tmbin[:, 0]))
+    tracks = xr.open_dataset(tmtracks, mask_and_scale=False)
+    # we load it into memory now, because while we run the file may change
+    # if the simulation is still running, and this causes NETcdf issues
+    # In general, very little memory is required to load the tracks.
+    tracks.load()
+    all_ids = tracks.id[(tracks.itrack != 0).any(dim="time")]
     if ids is None:
         ntracks = all_ids.size
         ids = all_ids
     else:
         ids = np.atleast_1d(np.squeeze(ids))
         ntracks = np.size(ids)
-    tsteps = np.datetime64(tstart) + \
-             np.asarray(tmbin[:, 1]*86400, dtype="timedelta64[s]").astype("timedelta64[ns]")
-    tcoord = np.unique(tsteps)
+    tcoord = np.datetime64(tstart) + tracks.time
 
-    tracks = grid.drop(grid.data_vars.keys())
+    for k,v in grid.drop(grid.data_vars.keys()).items():
+        tracks.coords[k] = v
     tracks.attrs["MITgcm_dir"] = mitdir
     tracks.attrs["tracmass_file"] = tmtracks
-    tracks.coords["id"] = ("id", ids)
-    tracks.coords["time"] = ("time", np.unique(tsteps))
+    tracks.coords["time"] = ("time", tcoord)
     # we also store the full mesh with edges coordinates
     tracks.coords["i_p1"] = ("i_p1", np.arange(xG.shape[1]))
     tracks.coords["j_p1"] = ("j_p1", np.arange(xG.shape[0]))
@@ -75,39 +72,19 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
                                          coords={"id": ids,
                                                  "time": tcoord},
                                          dims=["id", "time"])
-    if inds:
-        tracks["itrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                             coords={"id": ids,
-                                                     "time": tcoord},
-                                             dims=["id", "time"])
-        tracks["jtrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                             coords={"id": ids,
-                                                     "time": tcoord},
-                                             dims=["id", "time"])
-        tracks["ktrack"] = xr.DataArray(np.empty((ntracks, tcoord.size))*np.nan,
-                                             coords={"id": ids,
-                                                     "time": tcoord},
-                                             dims=["id", "time"])
 
+    progress = "Process id: %d " + ("(total: %d)" % ids.size)
     for thisid in ids:
-        print("Process id: %d (total: %d)" % (thisid, ids.size))
-        thisind = np.where(tmbin[:, 0]==thisid)[0]
+        print(progress % thisid)
+        trid = tracks.sel(id=thisid, drop=True)
         # NOTE: we can use these indices directly, because the grid in tracmass
         # has been defined starting from zero, similarly to python's indexing.
-        ii = tmbin[thisind, 2]
-        ii_int = np.int32(ii)
-        jj = tmbin[thisind, 3]
-        jj_int = np.int32(jj)
-        kk = tmbin[thisind, 4]
-        kk_int = np.int32(kk)
-
-        if inds:
-            tracks["itrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
-                          np.atleast_2d(ii)
-            tracks["jtrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
-                          np.atleast_2d(jj)
-            tracks["ktrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
-                          np.atleast_2d(kk)
+        ii = trid.itrack
+        ii_int = ii.astype("int32")
+        jj = trid.jtrack
+        jj_int = jj.astype("int32")
+        kk = trid.ktrack
+        kk_int = kk.astype("int32")
 
         nx = ii - ii_int
         px = 1.0 - nx
@@ -115,22 +92,27 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, inds=False, **xmgcm):
         py = 1.0 - ny
         nz = kk - kk_int
         pz = 1.0 - nz
+        
+        pxpy = px * py
+        pxny = px * ny
+        nxpy = nx * py
+        nxny = nx * ny
 
         # x
-        st = px * (py * xG[jj_int, ii_int] + ny * xG[jj_int+1, ii_int]) + \
-             nx * (py * xG[jj_int, ii_int+1] + ny * xG[jj_int+1, ii_int+1])
-        tracks["xtrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
+        st = pxpy * xG[jj_int, ii_int] + pxny * xG[jj_int+1, ii_int] + \
+             nxpy * xG[jj_int, ii_int+1] + nxny * xG[jj_int+1, ii_int+1]
+        tracks["xtrack"].loc[{"id": [thisid], "time": tcoord}] = \
                       np.atleast_2d(st)
 
         # y
-        st = px * (py * yG[jj_int, ii_int] + ny * yG[jj_int+1, ii_int]) + \
-             nx * (py * yG[jj_int, ii_int+1] + ny * yG[jj_int+1, ii_int+1])
-        tracks["ytrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
+        st = pxpy * yG[jj_int, ii_int] + pxny * yG[jj_int+1, ii_int] + \
+             nxpy * yG[jj_int, ii_int+1] + nxny * yG[jj_int+1, ii_int+1]
+        tracks["ytrack"].loc[{"id": [thisid], "time": tcoord}] = \
                       np.atleast_2d(st)
 
         # z
         st = pz * Z[kk_int, jj_int, ii_int] + nz * Z[kk_int+1, jj_int, ii_int]
-        tracks["ztrack"].loc[{"id": [thisid], "time": tsteps[thisind]}] = \
+        tracks["ztrack"].loc[{"id": [thisid], "time": tcoord}] = \
                       np.atleast_2d(st)
 
-    return tracks.where(np.isfinite(tracks.xtrack))
+    return tracks.where(tracks.itrack != 0)
