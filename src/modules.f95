@@ -490,7 +490,7 @@ MODULE mod_ncwrite
     ! Define position variables
     CALL check( nf90_def_var(file_id, "itrack", NF90_FLOAT, &
                (/id_dim, time_dim/), x_var) )
-    CALL check( nf90_def_var_fill(file_id, x_var, 0, -9.0E30) )
+    CALL check( nf90_def_var_fill(file_id, x_var, 0, 0.0) )
     CALL check( nf90_put_att(file_id, x_var, "units", "fractional_cell_index") )
     CALL check( nf90_def_var_chunking(file_id, x_var, NF90_CHUNKED, &
                                       (/ntracmax, 100/)) )
@@ -498,7 +498,7 @@ MODULE mod_ncwrite
 
     CALL check( nf90_def_var(file_id, "jtrack", NF90_FLOAT, &
                (/id_dim, time_dim/), y_var) )
-    CALL check( nf90_def_var_fill(file_id, y_var, 0, -9.0E30))
+    CALL check( nf90_def_var_fill(file_id, y_var, 0, 0.0))
     CALL check( nf90_put_att(file_id, y_var, "units", "fractional_cell_index") )
     CALL check( nf90_def_var_chunking(file_id, y_var, NF90_CHUNKED, &
                                       (/ntracmax, 100/)) )
@@ -506,7 +506,7 @@ MODULE mod_ncwrite
 
     CALL check( nf90_def_var(file_id, "ktrack", NF90_FLOAT, &
                (/id_dim, time_dim/), z_var) )
-    CALL check( nf90_def_var_fill(file_id, z_var, 0, -9.0E30) )
+    CALL check( nf90_def_var_fill(file_id, z_var, 0, 0.0) )
     CALL check( nf90_put_att(file_id, z_var, "units", "fractional_cell_index") )
     CALL check( nf90_def_var_chunking(file_id, z_var, NF90_CHUNKED, &
                                       (/ntracmax, 100/)) )

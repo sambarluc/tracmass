@@ -326,6 +326,12 @@ t0     =  trj(7,ntrac)
        CALL write_ncpos(ncid_out, ntrac, x1, y1, z1, tt, NCtime_out)
     CASE (40) !error
        CALL write_ncpos(ncid_err, ntrac, x1, y1, z1, tt, NCtime_err)
+    CASE (99) ! sync file
+        CALL check( nf90_sync(ncid_ini) )
+        CALL check( nf90_sync(ncid_run) )
+        CALL check( nf90_sync(ncid_kll) )
+        CALL check( nf90_sync(ncid_out) )
+        CALL check( nf90_sync(ncid_err) )
     END SELECT
 #endif /* ncwrite */
 

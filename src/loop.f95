@@ -174,7 +174,7 @@ SUBROUTINE loop
 
      call active_ints(ints)
      !=== Check if the output file should be switched. ===
-     call writedata(99)! switch
+     IF (MOD(ints, 10) .EQ. 0) call writedata(99)! switch
 
      !=======================================================
      !=== Loop over all trajectories and calculate        ===
