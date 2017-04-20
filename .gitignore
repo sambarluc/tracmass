@@ -6,6 +6,8 @@
 *.txt
 *.png
 *.bin
+transform.c
+transform.so
 results
 runtraj
 runtracmass

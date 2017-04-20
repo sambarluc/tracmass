@@ -19,6 +19,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
     import xarray as xr
     from xmitgcm import open_mdsdataset as mitgcmds
     from . import _get_geometry
+    from transform import transform
 
     xmgcm["swap_dims"] = False
     grid = mitgcmds(mitdir, read_grid=True, iters=[], **xmgcm)
@@ -73,46 +74,27 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
                                                  "id": ids},
                                          dims=["time", "id"])
 
-    print("Convert particle trajectories...")
+    print("Converting particle trajectories...")
+    stx = np.empty((tracks.sel(id=1).itrack.size, 1))
+    sty = np.empty_like(stx)
+    stz = np.empty_like(stx)
     for thisid in ids:
         trid = tracks.sel(id=thisid, drop=True)
         # NOTE: we can use these indices directly, because the grid in tracmass
         # has been defined starting from zero, similarly to python's indexing.
-        ii = trid.itrack
-        ii_int = ii.astype("int32")
-        jj = trid.jtrack
-        jj_int = jj.astype("int32")
-        kk = trid.ktrack
-        kk_int = kk.astype("int32")
+        ii = trid.itrack.to_masked_array().filled(0)
+        jj = trid.jtrack.to_masked_array().filled(0)
+        kk = trid.ktrack.to_masked_array().filled(0)
 
-        nx = ii - ii_int
-        px = 1.0 - nx
-        ny = jj - jj_int
-        py = 1.0 - ny
-        nz = kk - kk_int
-        pz = 1.0 - nz
+        transform(ii, jj, kk, xG, yG, Z, stx, sty, stz)
         
-        pxpy = px * py
-        pxny = px * ny
-        nxpy = nx * py
-        nxny = nx * ny
-
-        # x
-        st = pxpy * xG[jj_int, ii_int] + pxny * xG[jj_int+1, ii_int] + \
-             nxpy * xG[jj_int, ii_int+1] + nxny * xG[jj_int+1, ii_int+1]
         tracks["xtrack"].loc[{"id": [thisid], "time": tcoord}] = \
-                      np.atleast_2d(st).T
-
-        # y
-        st = pxpy * yG[jj_int, ii_int] + pxny * yG[jj_int+1, ii_int] + \
-             nxpy * yG[jj_int, ii_int+1] + nxny * yG[jj_int+1, ii_int+1]
+                      stx
         tracks["ytrack"].loc[{"id": [thisid], "time": tcoord}] = \
-                      np.atleast_2d(st).T
-
-        # z
-        st = pz * Z[kk_int, jj_int, ii_int] + nz * Z[kk_int+1, jj_int, ii_int]
+                      sty
         tracks["ztrack"].loc[{"id": [thisid], "time": tcoord}] = \
-                      np.atleast_2d(st).T
+                      stz
+
     print("Done.")
 
     return tracks.where(tracks.itrack != 0)
