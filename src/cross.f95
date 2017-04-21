@@ -23,13 +23,15 @@ subroutine cross_stat(ijk,ia,ja,ka,r0,sp,sn)
   !    sp,sn   : crossing time to reach the grid box wall 
   !              (in units of s/m3)
   
-USE mod_grid, only: undef, imt, jmt, nsm, nsp
+USE mod_grid, only: undef, nsm, nsp
 USE mod_vel, only: uflux, vflux, wflux, ff
+#ifdef turb   
 USE mod_active_particles, only: upr
-USE mod_time, only: dtreg, intrpr, intrpg
+#endif
+USE mod_time, only: intrpr, intrpg
 IMPLICIT none
 
-real*8                                       :: r0, ba, sp, sn, uu, um, vv, vm
+real*8                                       :: r0, ba, sp, sn, uu, um
 integer                                      :: ijk, ia, ja, ka, ii, im
 
 if(ijk.eq.1) then

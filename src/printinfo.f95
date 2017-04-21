@@ -162,11 +162,9 @@ CONTAINS
 
   subroutine print_cycle_loop()
   ! === Timing ===
-    INTEGER, dimension(3)                      :: itimearray 
     INTEGER                                    :: sysrate, sysmax
     INTEGER, save                              :: currclock, lastclock=0
-    REAL, dimension(2)                         :: wallarray 
-    REAL                                       :: walltime, walltot
+    REAL                                       :: walltime
     INTEGER                                    :: wallmin, wallsec
  
 #ifdef sediment
@@ -184,7 +182,6 @@ CONTAINS
     if (lastclock == 0) lastclock = currclock
     walltime = (currclock - lastclock)/1000
     lastclock = currclock
-    !call dtime(wallarray, walltime)
     wallmin = int(walltime/60)
     wallsec = walltime - wallmin*60
 

@@ -20,13 +20,15 @@ subroutine pos_orgn(ijk,ia,ja,ka,r0,r1,ds)
   !====================================================================
   
   USE mod_precdef
-  USE mod_grid, only: imt, jmt, nsm, nsp, nst
+  USE mod_grid, only: nsm, nsp
   USE mod_vel, only: uflux, vflux, wflux, ff
+#ifdef turb
   USE mod_active_particles, only: upr
+#endif
   USE mod_time, only: intrpr, intrpg
   IMPLICIT none
 
-  real(DP)                                   :: r0, r1, ds, uu, um, vv, vm, en
+  real(DP)                                   :: r0, r1, ds, uu, um
   integer                                    :: ijk, ia, ja, ka, ii, im
   
   
@@ -42,7 +44,7 @@ subroutine pos_orgn(ijk,ia,ja,ka,r0,r1,ds)
      im=ia-1
      uu=(intrpg*uflux(ia,ja,ka,nsp)+intrpr*uflux(ia,ja,ka,nsm))*ff
      um=(intrpg*uflux(im,ja,ka,nsp)+intrpr*uflux(im,ja,ka,nsm))*ff
-#ifdef turb    
+#ifdef turb
      if(r0.ne.dble(ii)) then
         uu=uu+upr(1,2)  
      else

@@ -161,16 +161,19 @@ CONTAINS
 
     IMPLICIT NONE
 
-    REAL                                 :: vort
-    INTEGER                              :: sel ,xf ,yf ,zf ,n
+    INTEGER                              :: sel ,xf ,yf ,zf
+#ifndef ncwrite
     INTEGER*8, SAVE                      :: recPosIn=0  ,recPosOut=0
     INTEGER*8, SAVE                      :: recPosRun=0 ,recPosErr=0
     INTEGER*8, SAVE                      :: recPosKll=0
     REAL                                 :: x14 ,y14 ,z14
     REAL*8                               :: twrite
+#endif
     ! === Variables to interpolate fields ===
+#ifdef tempsalt
     REAL                                       :: temp, salt, dens
     REAL                                       :: temp2, salt2, dens2
+#endif
 
 566 format(2i8,3f10.4,2f12.4 &
          ,f12.0,f6.1,f6.2,f6.2,f6.0,8e8.1 )
@@ -178,12 +181,6 @@ CONTAINS
     xf   = floor(x1)
     yf   = floor(y1)
     zf   = floor(z1)
-    
-    !if ((sel .ne. 19) .and. (sel.ne.40)) then
-       ! this requires too much memory
-       !       vort = (vvel(xf+1,yf,zf)-vvel(xf-1,yf,zf))/4000 - &
-       !            (uvel(xf,yf+1,zf)-uvel(xf,yf-1,zf))/4000   
-    !end if
     
 subvol =  trj(5,ntrac)
 t0     =  trj(7,ntrac)

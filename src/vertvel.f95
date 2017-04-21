@@ -13,6 +13,10 @@ subroutine vertvel(ia,iam,ja,ka)
   USE mod_orbital
 #endif
   
+#if defined twodim || explicit_w
+  return
+#else
+  
   IMPLICIT none
     
   real*8                                     :: uu, um, vv, vm
@@ -20,10 +24,6 @@ subroutine vertvel(ia,iam,ja,ka)
   integer                                    :: n1, n2
 
   REAL                                       :: kin 
-  
-#if defined twodim || explicit_w
-  return
-#else
    
   n1=min(nsm,nsp)
   n2=max(nsm,nsp)

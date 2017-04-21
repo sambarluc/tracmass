@@ -28,10 +28,7 @@ SUBROUTINE init_params
 
 !!----------------------------------------------------------------------------
    
-   INTEGER                                    ::  argint1 ,argint2
-   INTEGER                                    ::  dummy ,factor ,i ,dtstep
-   INTEGER                                    ::  gridVerNum ,runVerNum
-   CHARACTER (LEN=30)                         ::  inparg, argname
+   INTEGER                                    ::  gridVerNum
 
 ! Setup namelists
    namelist /INIT_NAMELIST_VERSION/ gridVerNum

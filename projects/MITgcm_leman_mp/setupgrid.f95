@@ -29,12 +29,8 @@ SUBROUTINE setupgrid
 
 
   ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
-  ! = Variables for filename generation 
-  INTEGER, SAVE                             :: nread,ndates
-  CHARACTER(LEN=10), SAVE                   :: fstamp
-  
   ! = Loop variables
-  INTEGER                                   :: i ,j ,k
+  INTEGER                                   :: k
   
   ! = Variables used for getfield procedures
   CHARACTER (len=200)                       :: gridfile

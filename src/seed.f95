@@ -49,10 +49,10 @@ CONTAINS
 
    SUBROUTINE seed (tt,ts)
 
-     INTEGER                                  :: errCode
      INTEGER                                  :: subtimesteps = 1, subtstep
-     INTEGER                                  :: i, j, k, l, m
+#ifdef tempsalt
      REAL                                     :: temp,salt,dens
+#endif
      REAL(DP)                                 :: tt, ts
      REAL(DP)                                 :: vol, subvol
 
@@ -124,7 +124,7 @@ CONTAINS
                vol = vflux (iist,ijst,ikst,nsm)
                
             CASE (3)  ! Through upper zonal-meridional surface
-               CALL vertvel (1.d0,ib,ibm,jb,kb)
+            CALL vertvel (1.d0,ib,ibm,jb,kb)
 #if defined explicit_w || full_wflux
                vol = wflux(ib,jb,kb,nsm)
 #elif twodim

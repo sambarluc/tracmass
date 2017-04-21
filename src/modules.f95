@@ -130,7 +130,7 @@ MODULE mod_grid
 CONTAINS
   function l2d(lon1,lon2,lat1,lat2)
     real                                    :: lon1,lon2,lat1,lat2,l2d
-    real                                    :: rlon1,rlon2,rlat1,rlat2
+    real                                    :: rlat1,rlat2
     real                                    :: dlon,dlat,a,c
     dlon = (lon2 - lon1)/180*pi
     rlat1 = lat1 /180.*pi
@@ -325,7 +325,9 @@ CONTAINS
   subroutine datasetswap
 
     USE  mod_grid, only      : nsm,nsp,hs
+#ifdef tempsalt
     USE  mod_tempsalt, only  : tem,sal,rho
+#endif
 
     IMPLICIT NONE
 

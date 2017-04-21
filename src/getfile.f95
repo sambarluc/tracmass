@@ -85,9 +85,7 @@ END MODULE mod_getMITgcm
 
 MODULE mod_getfile
   USE mod_grid
-#ifndef no_netcdf
   USE netcdf
-#endif
   IMPLICIT NONE
 
   INTEGER, DIMENSION(1)                      :: start1D  ,count1D
@@ -98,7 +96,6 @@ MODULE mod_getfile
   INTEGER                                    :: ierr, varid,ncid
   LOGICAL                                    :: file_exists
 
-#ifndef no_netcdf
   CONTAINS
 
  !===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
@@ -280,7 +277,6 @@ MODULE mod_getfile
        
     end select
   end subroutine printReadError
-#endif
 end MODULE mod_getfile
 
 

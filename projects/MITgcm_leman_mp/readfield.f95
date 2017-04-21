@@ -16,12 +16,11 @@ SUBROUTINE readfields
   IMPLICIT none
   ! ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===   ===
   ! = Variables for filename generation 
-  INTEGER, SAVE                             :: nread,ndates
   INTEGER                                   :: timeStepNumber
   CHARACTER(LEN=10), SAVE                   :: fstamp
   
   ! = Loop variables
-  INTEGER                                   :: t ,i ,j ,k
+  INTEGER                                   :: k
   
   ! = Variables used for getfield procedures
   CHARACTER (len=200)                       :: gridfile
@@ -47,7 +46,6 @@ SUBROUTINE readfields
      sal   = 0.
      rho   = 0.
 #endif
-     ndates=0
    endif initCond
   
   start3d  = [   1,  1, 1]

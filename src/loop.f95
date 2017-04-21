@@ -17,9 +17,9 @@ SUBROUTINE loop
   USE mod_param,    only: ntracmax, undef, tday 
   USE mod_loopvars, only: dse, dsw, dsmin, ds, dsu, dsd, dsn, dss, &
                           niter, lbas, scrivi, subvol
-  USE mod_grid,     only: imt, jmt, km, kmt, kmtb, dyu, dxv, dxdy, dxyz, dz, dzt, &
+  USE mod_grid,     only: imt, jmt, km, kmt, kmtb, dxdy, dxyz, dz, dzt, &
                           mask, iter, nsm, nsp, hs, calc_dxyz, nperio !joakim
-  use mod_vel,      only: uflux, vflux, wflux
+  use mod_vel,      only: uflux, vflux
   USE mod_seed,     only: ff, nff, seedTime, seed
   USE mod_domain,   only: timax, jens, jenn, iene, ienw
   USE mod_vel,      only: degrade_counter, degrade_time
@@ -36,14 +36,15 @@ SUBROUTINE loop
   IMPLICIT none
 
   ! === Loop variables ===
-  INTEGER                                    :: i,  j,  k, l, m, n
+  INTEGER                                    :: k
   ! === Variables to interpolate fields ===
+#if defined tempsalt
   REAL                                       :: temp, salt, dens
   REAL                                       :: temp2, salt2, dens2
+#endif
   ! === Error Evaluation ===
   INTEGER                                    :: errCode
   INTEGER                                    :: landError=0, boundError=0
-  REAL                                       :: zz
   
   call print_start_loop
   

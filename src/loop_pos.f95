@@ -16,12 +16,14 @@ contains
   
   subroutine  pos(ia,iam,ja,ka,ib,jb,kb,x0,y0,z0,x1,y1,z1)
     
-    INTEGER                                    :: mra,mta,msa
+    INTEGER                                    :: mta,msa
     INTEGER                                    :: mrb,mtb,msb
     REAL                                       :: uu
     INTEGER                                    :: ia, iam, ja, ka,kk
     INTEGER                                    :: ib, jb, kb
+#if defined streamr || streamts || stream_thermohaline
     REAL                                       :: temp,salt,dens
+#endif
     REAL(DP), INTENT(IN)                       :: x0, y0, z0
     REAL(DP), INTENT(OUT)                      :: x1, y1, z1
       

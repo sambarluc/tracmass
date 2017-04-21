@@ -29,8 +29,7 @@ PROGRAM TRACMASS
   USE mod_diffusion
 #endif
   
-  IMPLICIT none
-  INTEGER                                    :: i,j,n
+  IMPLICIT NONE
 
   call print_header_main
   call init_params
