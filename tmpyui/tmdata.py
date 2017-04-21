@@ -75,7 +75,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
                                          dims=["time", "id"])
 
     print("Converting particle trajectories...")
-    stx = np.empty((tracks.sel(id=1).itrack.size, 1))
+    stx = np.empty((tracks.itrack.shape[0], 1))
     sty = np.empty_like(stx)
     stz = np.empty_like(stx)
     for thisid in ids:
