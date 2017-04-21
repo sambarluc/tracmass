@@ -6,7 +6,7 @@ def transform(float[:] ii,
               float[:] kk,
               double[:, ::1] X,
               double[:, ::1] Y,
-              double[:, :, :] Z,
+              double[:, :, ::1] Z,
               double[:, ::1] stx,
               double[:, ::1] sty,
               double[:, ::1] stz):

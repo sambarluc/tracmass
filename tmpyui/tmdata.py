@@ -34,7 +34,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
     Z = np.zeros((dZ.shape[0] + 1, dZ.shape[1], dZ.shape[2]))
     Z[1:, ...] = np.cumsum(dZ, axis=0).filled(0)
     # tracmass has opposite Z order
-    Z = Z[::-1, ...]
+    Z = np.ascontiguousarray(Z[::-1, ...])
 
     tracks = xr.open_dataset(tmtracks, mask_and_scale=False)
     # we load it into memory now, because while we run the file may change
