@@ -124,7 +124,9 @@ CONTAINS
                vol = vflux (iist,ijst,ikst,nsm)
                
             CASE (3)  ! Through upper zonal-meridional surface
+#if !(defined twodim || defined explicit_w)
             CALL vertvel (1.d0,ib,ibm,jb,kb)
+#endif
 #if defined explicit_w || full_wflux
                vol = wflux(ib,jb,kb,nsm)
 #elif twodim

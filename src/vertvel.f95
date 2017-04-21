@@ -13,7 +13,7 @@ subroutine vertvel(ia,iam,ja,ka)
   USE mod_orbital
 #endif
   
-#if defined twodim || explicit_w
+#if defined twodim || defined explicit_w
   return
 #else
   

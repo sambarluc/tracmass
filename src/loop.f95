@@ -292,7 +292,9 @@ SUBROUTINE loop
            call active_niter 
            !call turbuflux(ia,ja,ka,dt)
            ! === calculate the vertical velocity ===
+#if !(defined twodim || defined explicit_w)
            call vertvel(ia,iam,ja,ka)
+#endif
 #ifdef timeanalyt
 !           ss0=dble(int(ts,8))*tseas/dxyz or should ssp be in the call cross_time?
            call cross_time(1,ia,ja,ka,x0,dse,dsw) ! zonal

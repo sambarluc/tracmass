@@ -233,7 +233,9 @@ contains
 
        kk = ka
 
+#if !(defined twodim || defined explicit_w)
        call vertvel(ia,iam,ja,kk)
+#endif
 #if defined explicit_w || full_wflux
        uu=intrpbg*wflux(ia, ja, kk,nsp)+intrpb*wflux(ia, ja, kk,nsm)
 #else
@@ -279,7 +281,9 @@ contains
 
        kk = ka - 1
 
+#if !(defined twodim || defined explicit_w)
        call vertvel(ia, iam, ja, kk)
+#endif
      
 #if defined explicit_w || full_wflux
        if(intrpbg*wflux(ia, ja, kk,nsp)+intrpb*wflux(ia, ja, kk,nsm).lt.0.d0) kb=ka-1
