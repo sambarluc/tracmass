@@ -18,7 +18,7 @@ X, Z = np.meshgrid(xs, zs)
 Y, Z = np.meshgrid(ys, zs)
 
 d.ijklims(ii=X.ravel(), jj=Y.ravel(), kk=Z.ravel(), inds=False,)
-d.run(4)
+d.run(3, ni0=15)
 
 from numpy import savetxt
 

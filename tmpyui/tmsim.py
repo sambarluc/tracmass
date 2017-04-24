@@ -155,9 +155,11 @@ class tmsim(object):
         #    self.mpinds.append(indlist[nc*nsplit:(nc+1)*nsplit])
         #self.mpinds.append(indlist[(nc+1)*nsplit:])
 
-    def run(self, ncpu=1):
+    def run(self, ncpu=1, ni0=None, ni1=None):
         """
         Run simulation on ncpu cores. Each realese grid cell is run separately.
+        ni0, ni1: if given, run simulations numbered from ni0 to ni1 included only.
+                  Useful to repeat some simulations, etc.
         """
         if not np.issubdtype(type(ncpu), np.integer):
             raise TypeError("Number of cpus must be an integer.")
@@ -176,9 +178,16 @@ class tmsim(object):
 
         procs = []
         ijkproc = []
+        if ni0 is None:
+            ni0 = 0
+        if ni1 is None:
+            ni1 = len(self.indlist) - 1
         outf = [open(join(self.projdir, ("output_%.6d.txt" % nproc)), 'w')
+                if (nproc >= ni0) & (nproc <= ni1) else None
                 for nproc, _ in enumerate(self.indlist)]
         for nproc, ijk in enumerate(self.indlist):
+            if (nproc < ni0) or (nproc > ni1):
+                continue
             # generate namelist for the grid point
             if self.seed_inds:
                 nml = self._make_namelist(i1=ijk[0], i2=ijk[0],
