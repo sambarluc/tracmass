@@ -53,16 +53,7 @@ def _get_geometry(grid, geometry):
         raise ValueError("Grid geometry not recognised.")
     return xG, yG
 
-def _xy2grid(x, y, Ax, Ay, Bx, By, Cx, Cy, Dx, Dy):
-    from numpy import sqrt
-    # form Mathematica
-    gx = (1/(2*((Ay-By)*(Cx-Dx)-(Ax-Bx)*(Cy-Dy)))) * \
-         (Ay*Cx-2*Ay*Dx+By*Dx-Bx*Dy+Ay*x-By*x+Cy*x-Dy*x+Bx*y-Cx*y+Dx*y-Ax*(Cy-2*Dy+y) + \
-         sqrt((By*(Dx-x)+Cy*x-Dy*(Bx+x)+Ay*(Cx-2*Dx+x)+(Bx-Cx+Dx)*y-Ax*(Cy-2*Dy+y))**2 + \
-         4*((Ay-By)*(Cx-Dx)-(Ax-Bx)*(Cy-Dy))*(Ay*(Dx-x)+Dy*x-Dx*y+Ax*(-Dy + y))))
-         
-    gy = (1/(2*((-(By-Cy))*(Ax-Dx)+(Bx-Cx)*(Ay-Dy)))) * \
-         (2*Ay*Bx-2*Ax*By-Ay*Cx+Ax*Cy+By*Dx-Bx*Dy-Ay*x+By*x-Cy*x+Dy*x+Ax*y-Bx*y+Cx*y-Dx*y + \
-         sqrt((By*(Dx-x)+Cy*x-Dy*(Bx+x)+Ay*(Cx-2*Dx+x)+(Bx-Cx+Dx)*y-Ax*(Cy-2*Dy+y))**2 + \
-         4*((Ay-By)*(Cx-Dx)-(Ax-Bx)*(Cy-Dy))*(Ay*(Dx-x)+Dy*x-Dx*y+Ax*(-Dy+y))))
-    return gx, gy
+def _xy2grid(x, y, dX, dY, C, S):
+    nx = (C * x + S * y) / dX
+    ny = (-S * x + C * y) / dY
+    return nx, ny

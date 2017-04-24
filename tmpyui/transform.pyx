@@ -6,6 +6,10 @@ def transform(float[:] ii,
               float[:] kk,
               double[:, ::1] X,
               double[:, ::1] Y,
+              double[:, ::1] dX,
+              double[:, ::1] dY,
+              double[:, ::1] CS,
+              double[:, ::1] SN,
               double[:, :, ::1] Z,
               double[:, ::1] stx,
               double[:, ::1] sty,
@@ -13,7 +17,7 @@ def transform(float[:] ii,
 
     cdef int m, ii_int, jj_int, kk_int
     cdef double nx, ny, px, py, pxpy, pxny, nxpy, nxny, nz
-    cdef double i, j ,k
+    cdef double i, j ,k, cosij, sinij, dxij, dyij
     cdef int N = ii.size
 
     for m in range(N):
@@ -31,20 +35,18 @@ def transform(float[:] ii,
 
         # inside the cell
         if (nx >= 1e-9) & (ny >= 1e-9):
-            px = 1.0 - nx
-            py = 1.0 - ny
-            pxpy = px * py
-            pxny = px * ny
-            nxpy = nx * py
-            nxny = nx * ny
+            cosij = CS[jj_int, ii_int]
+            sinij = SN[jj_int, ii_int]
+            dxij = dX[jj_int, ii_int]
+            dyij = dY[jj_int, ii_int]
 
             # x
-            stx[m, 0] = pxpy * X[jj_int, ii_int] + pxny * X[jj_int+1, ii_int] + \
-                        nxpy * X[jj_int, ii_int+1] + nxny * X[jj_int+1, ii_int+1]
+            stx[m, 0] = X[jj_int, ii_int] + \
+                        cosij * dxij * nx - sinij * dyij * ny
 
             # y
-            sty[m, 0] = pxpy * Y[jj_int, ii_int] + pxny * Y[jj_int+1, ii_int] + \
-                        nxpy * Y[jj_int, ii_int+1] + nxny * Y[jj_int+1, ii_int+1]
+            sty[m, 0] = Y[jj_int, ii_int] + \
+                        sinij * dxij * nx + cosij * dyij * ny
 
             # z
             if nz >= 1e-9:
@@ -68,13 +70,15 @@ def transform(float[:] ii,
                 stz[m, 0] = Z[kk_int, jj_int, ii_int]
         # on W face
         elif nx < 1e-9:
-            py = 1.0 - ny
+            cosij = CS[jj_int, ii_int]
+            sinij = SN[jj_int, ii_int]
+            dyij = dY[jj_int, ii_int]
 
             # x
-            stx[m, 0] = py * X[jj_int, ii_int] + ny * X[jj_int+1, ii_int]
+            stx[m, 0] = X[jj_int, ii_int] - sinij * dyij * ny
 
             # y
-            sty[m, 0] = py * Y[jj_int, ii_int] + ny * Y[jj_int+1, ii_int]
+            sty[m, 0] = Y[jj_int, ii_int] + cosij * dyij * ny
 
 
             # z
@@ -85,13 +89,15 @@ def transform(float[:] ii,
                 stz[m, 0] = Z[kk_int, jj_int, ii_int]
         # on S face
         else:
-            px = 1.0 - nx
+            cosij = CS[jj_int, ii_int]
+            sinij = SN[jj_int, ii_int]
+            dxij = dX[jj_int, ii_int]
 
             # x
-            stx[m, 0] = px * X[jj_int, ii_int] + nx * X[jj_int, ii_int+1]
+            stx[m, 0] = X[jj_int, ii_int] + cosij * dxij * nx
 
             # y
-            sty[m, 0] = px * Y[jj_int, ii_int] + nx * Y[jj_int, ii_int+1]
+            sty[m, 0] = Y[jj_int, ii_int] + sinij * dxij * nx
 
             # z
             if nz >= 1e-9:

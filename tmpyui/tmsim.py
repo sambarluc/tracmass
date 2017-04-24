@@ -100,6 +100,10 @@ class tmsim(object):
                             iters=[], prefix=["UVEL"], swap_dims=False,
                             geometry=geometry)
             xG, yG = _get_geometry(grid, geometry)
+            dX = grid.dxG
+            dY = grid.dyG
+            cs = grid.CS
+            sn = grid.SN
             dZ = (grid.drF * grid.hFacC).to_masked_array()
             zG = np.zeros((dZ.shape[0] + 1, dZ.shape[1], dZ.shape[2]))
             zG[1:, ...] = np.cumsum(dZ, axis=0).filled(0)
@@ -108,6 +112,14 @@ class tmsim(object):
             self.ii = np.zeros(ii.size) * np.nan
             self.jj = np.zeros(ii.size) * np.nan
             self.kk = np.zeros(ii.size) * np.nan
+            trials = ([-1, -1],
+                      [-1,  0],
+                      [-1,  1],
+                      [ 0, -1],
+                      [ 0,  1],
+                      [ 1, -1],
+                      [ 1,  0],
+                      [ 1,  1])
             for nn, (xx, yy, zz) in enumerate(zip(ii, jj, kk)):
                 for jj, ii in product(range(xG.shape[0]-1), range(xG.shape[1]-1)):
                     bbPath = Path([[xG[jj, ii], yG[jj, ii]],
@@ -115,15 +127,24 @@ class tmsim(object):
                                    [xG[jj+1, ii+1], yG[jj+1, ii+1]],
                                    [xG[jj+1, ii], yG[jj+1, ii]]])
                     if bbPath.contains_point((xx, yy)):
-                        nx, ny = _xy2grid(xx, yy,
-                                          xG[jj, ii], #Ax
-                                          yG[jj, ii], #Ay
-                                          xG[jj, ii+1], #Bx
-                                          yG[jj, ii+1], #By
-                                          xG[jj+1, ii+1], #Cx
-                                          yG[jj+1, ii+1], #Cy
-                                          xG[jj+1, ii], #Dx
-                                          yG[jj+1, ii]) #Dy
+                        nx, ny = _xy2grid(xx - xG[jj, ii], yy - yG[jj, ii],
+                                          dX[jj, ii], dY[jj, ii],
+                                          cs[jj, ii], sn[jj, ii])
+                        # since some corner points are approximate, we must
+                        # check the computed nx and ny, and in case seek in
+                        # nearby cell
+                        if (nx < 0) or (nx > 1) or (ny < 0) or (ny > 1):
+                            for ijtry in trials:
+                                ii = ii - ijtry[0]
+                                jj = jj - ijtry[1]
+                                nx, ny = _xy2grid(xx - xG[jj, ii], yy - yG[jj, ii],
+                                                  dX[jj, ii], dY[jj, ii],
+                                                  cs[jj, ii], sn[jj, ii])
+                                if (nx >= 0) and (nx < 1) and (ny >=0) and (ny < 1):
+                                    break
+                            else:
+                                raise ValueError("Could not find the point (x=%f, y=%f)" 
+                                                 % xx, yy)
                         z_here = zG[:, jj, ii]
                         if (zz > z_here.max()) or (zz <= z_here.min()):
                             print("Point outside vertical bounds at x,y,z=%.2f,%.2f,%.2f" %

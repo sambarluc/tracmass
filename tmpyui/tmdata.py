@@ -60,6 +60,15 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
     tracks.coords["j_p1"] = ("j_p1", np.arange(xG.shape[0]))
     tracks.coords["XG_p1"] = (("j_p1", "i_p1"), xG)
     tracks.coords["YG_p1"] = (("j_p1", "i_p1"), yG)
+    # now that we stored the full coordinates, we keep only the SW corners
+    # and other metrics to compute the conversion from fractional index
+    # to physical coordinate
+    xG = tracks.XG.to_masked_array().filled(0).astype("<f8")
+    yG = tracks.YG.to_masked_array().filled(0).astype("<f8")
+    dX = tracks.dxG.to_masked_array().filled(0).astype("<f8")
+    dY = tracks.dyG.to_masked_array().filled(0).astype("<f8")
+    CS = tracks.CS.to_masked_array().filled(0).astype("<f8")
+    SN = tracks.SN.to_masked_array().filled(0).astype("<f8")
 
     tracks["xtrack"] = xr.DataArray(np.empty((tcoord.size, ntracks))*np.nan,
                                          coords={"time": tcoord,
@@ -86,7 +95,7 @@ def tmdata(mitdir, tmtracks, tstart, ids=None, **xmgcm):
         jj = trid.jtrack.to_masked_array().filled(0)
         kk = trid.ktrack.to_masked_array().filled(0)
 
-        transform(ii, jj, kk, xG, yG, Z, stx, sty, stz)
+        transform(ii, jj, kk, xG, yG, dX, dY, CS, SN, Z, stx, sty, stz)
         
         tracks["xtrack"].loc[{"id": [thisid], "time": tcoord}] = \
                       stx
